@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Footer Design</title>
+    <style>
+        /* Footer Styling */
+        footer {
+            background: #e1f0da;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .footer-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .contact-info {
+            margin-bottom: 15px;
+        }
+
+        .contact-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #f8f8f8;
+        }
+
+        .contact-info p {
+            margin: 6px 0;
+            font-size: 15px;
+            background-color: #e1f0da;
+        }
+
+        .contact-info a {
+            color: #6dd5ed;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        .copyright {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .footer-container {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
+
+            .contact-info, .copyright {
+                flex: 1;
+            }
+        }
+
+        footer p {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <footer>
+        <p style="font-weight: bold; font-size:3vh;">Contact us: <a href="mailto:bdmvsbdmvs@gmail.com" style="color: blue;">bdmvs@gmail.com</a></p>
+        <p style="font-weight: bold; font-size:3vh;">Follow us on: 
+            <a href="https://www.linkedin.com" target="_blank" style="color: blue; font-size:3.2vh;"><i class="fa-brands fa-linkedin"></i></a> |
+            <a href="https://twitter.com" target="_blank" style="color: blue; font-size:3.2vh;"><i class="fa-brands fa-x-twitter"></i></a> |
+            <a href="https://github.com" target="_blank" style="color: blue; font-size:3.2vh;"><i class="fa-brands fa-github"></i></a>
+        </p>
+        <p style="font-weight: bold; font-size:3vh;">&copy; 2025 BDMVS - Biological Database Management and Visualization System. All rights reserved.</p>
+    </footer>    
+
+</body>
+</html>

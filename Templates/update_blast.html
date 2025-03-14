@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update BLAST</title>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="{% static 'Jquery/jquery.min.js' %}"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 50px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #007bff;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-container {
+            width: 50%;
+            margin: 50px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+        .form-container h2 {
+            text-align: center;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .input-box textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            resize: none;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .image-input {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 4vh;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .key-value {
+            display: flex;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .key-value .delete-icon {
+            position: absolute;
+            right: -35px;
+            top: 0;
+            cursor: pointer;
+            color: red;
+        }
+
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .center-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .center-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mt-5 mb-3">
+                <h1 class="page-header text-primary"><i class="fa-sharp fa-solid fa-pen-to-square"></i> Update BLAST Information</h1>
+            </div>
+            <div class="offset-md-1 col-md-10">
+                <!-- Form using POST method -->
+                <form method="POST" action="{% url 'update_blast' data.id %}" enctype="multipart/form-data" id="form">
+                    {% csrf_token %}
+                    <!-- Title Box -->
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" name="title" placeholder="Enter Title" id="title-box" value="{{ data.title }}">
+                    </div>
+
+                    <!-- Description Box -->
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" name="description" placeholder="Enter Description" id="description-box" rows="6">{{ data.description }}</textarea>
+                    </div>
+
+                    <!-- Parameters Section -->
+                    <div id="key-value-section">
+                        {% for item in data.parameters %}
+                            <div class="key-value">
+                                <input type="text" class="input-box mr-2" name="parameter_key" placeholder="Enter Parameter Key" value="{{ item.key }}">
+                                <input type="text" class="input-box" name="parameter_value" placeholder="Enter Parameter Value" value="{{ item.value }}">
+                                <i class="fa fa-trash delete-icon mt-4"></i>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Button to Add More Key-Value Pairs -->
+                    <div class="mb-3">
+                        <input type="button" value="Add" class="form-control" id="addrow" style="background-color: red; color:white;">
+                    </div>
+
+                    <!-- Image File Input -->
+                    <div class="form-group">
+                        <label for="image">Image</label>
+                        <input type="file" class="form-control" name="image" id="image-input">
+                        {% if data.image %}
+                            <img src="{{ data.image.url }}" alt="Current image" width="100">
+                        {% else %}
+                            <p>No image uploaded</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button class="btn btn-primary btn-block" type="submit">Save Changes</button>
+                </form>
+                <a href="{% url 'search_category' %}" class="center-link mb-5"><b>Back to Home Page</b></a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Add a new key-value row
+            $("#addrow").click(function () {
+                var newRow = `
+                    <div class="key-value">
+                        <input type="text" class="input-box mr-2" name="parameter_key" placeholder="Enter Parameter Key">
+                        <input type="text" class="input-box" name="parameter_value" placeholder="Enter Parameter Value">
+                        <i class="fa fa-trash delete-icon mt-4"></i>
+                    </div>
+                `;
+                $("#key-value-section").append(newRow);
+            });
+
+            // Event delegation for dynamically added rows
+            $(document).on('click', '.delete-icon', function () {
+                $(this).closest('.key-value').remove();
+            });
+
+            // Before form submission, collect all key-value pairs
+            $("form").submit(function (event) {
+                var parameters = [];
+
+                // Collect all key-value pairs
+                $(".key-value").each(function () {
+                    var key = $(this).find("input[name='parameter_key']").val();
+                    var value = $(this).find("input[name='parameter_value']").val();
+
+                    // Push to array as a key-value object
+                    if (key && value) {
+                        parameters.push({ key: key, value: value });
+                    }
+                });
+
+                // Convert the array to JSON string and set it in the hidden input field
+                var jsonParameters = JSON.stringify(parameters);
+
+                // Append the parameters to the form before submitting
+                $("<input>").attr({
+                    type: "hidden",
+                    name: "parameters",
+                    value: jsonParameters
+                }).appendTo("form");
+            });
+        });
+    </script>
+</body>
+</html>

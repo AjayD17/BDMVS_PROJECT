@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ data.title }}</title>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #6dd5ed, #2193b0);
+            padding-top: 0px;
+            margin-bottom: 10vh;
+        }
+
+        .key-value-pair {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1vh;
+        }
+
+        .key {
+            font-weight: bold;
+            width: 150px;
+            flex-shrink: 0;
+        }
+
+        .value {
+            flex-grow: 1;
+            margin-left: 20px;
+        }
+
+        .text-justify {
+            text-align: justify;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar Section -->
+    {% include "navbar.html" %}
+    
+    <!-- Content Section -->
+    <div class="container-fluid mt-5 mb-5">
+        <div class="card shadow p-4" style="margin-left:5vh; margin-right:5vh; width:95%;">
+            <div class="row">
+                <div class="col-md-8">
+                    <h3 class="text-primary">{{ data.title }}</h3>
+                    <h4 class="text-danger">Description:</h4>
+                    <p class="text-justify">{{ data.description }}</p>
+                    <h5 class="text-warning">{{ data.sub_title }}</h5>
+                    <div>
+                        {% for item1 in data.sub_content %}
+                            <div class="key-value-pair">
+                                <div class="key">{{ item1.key }}</div>
+                                <div class="value text-justify">{{ item1.value }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-4 mt-4">
+                    <!-- Image Section -->
+                    <img src="{{ data.image.url }}" class="img-fluid mb-3">
+
+                    <!-- YouTube Video Section -->
+                     <div class="d-flex justify-content-center">
+                        {% if data.youtube_video %}
+                        <div class="embed-responsive embed-responsive-16by9 mt-5">
+                            <iframe class="embed-responsive-item" src="{{ data.get_embedded_youtube_url }}" allowfullscreen></iframe>
+                        </div>
+                        {% else %}
+                            <button class="btn btn-danger text-white"><a href="https://www.youtube.com/results?search_query={{data.title}}" style="text-decoration: none; color:white;">{{ data.title }}</a></button>
+                        {% endif %}
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

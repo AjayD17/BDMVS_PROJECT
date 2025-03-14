@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Box with Table</title>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'Jquery/jquery.min.js' %}"></script>
+    <style>
+        /* Styling the navbar */
+        .navbar {
+            background-color: #343a40;
+            padding: 10px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            font-size: 18px;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        /* Styling the search container */
+        .search-container {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        /* Styling the search box */
+        .search-box {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        /* Styling the search button */
+        .search-button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        /* Styling the add button */
+        .add-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            margin-bottom: none;
+            margin-top: 2vh;
+        }
+
+        /* Styling for the category filter dropdown */
+        .category-filter {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .category-filter select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        /* Styling the table */
+        table {
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        thead {
+            background-color: #343a40;
+            color: white;
+        }
+
+        td a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        td a:hover {
+            text-decoration: underline;
+        }
+
+        tbody {
+            background-color: white;
+        }
+
+        /* Responsive table */
+        @media (max-width: 768px) {
+            .search-container {
+                margin-top: 30px;
+            }
+
+            .search-box, .search-button, .category-filter select {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .add-button {
+                width: 100%;
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">My Application</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-sm-12 col-md-12">
+                <div class="search-container d-flex justify-content-center align-items-center">
+                    <!-- Category Filter Dropdown -->
+                    <form method="POST" action="" class="category-filter">
+                        {% csrf_token %}
+                        <select name="category" onchange="this.form.submit()">
+                            <option value="protein" {% if category == 'protein' %}selected{% endif %}>Protein</option>
+                            <option value="enzyme" {% if category == 'enzyme' %}selected{% endif %}>Enzyme</option>
+                            <option value="hormone" {% if category == 'hormone' %}selected{% endif %}>Hormone</option>
+                            <option value="general" {% if category == 'general' %}selected{% endif %}>General</option>
+                        </select>
+                    </form>
+                
+                    <input type="text" class="search-box" style="margin-top:6vh;" placeholder="Enter your search..." id="search-input">
+                
+                    <!-- Search Button -->
+                    <button class="search-button" style="margin-top:6vh;">Search</button>
+                </div>                
+                <div class="d-flex flex-row justify-content-end mr-5">
+                    <a href="{% url 'new_file' %}"><button class="add-button"> Add </button></a>
+                </div>
+            </div>
+            <div class="col-12">
+                <!-- Table for search results -->
+                <table class="table table-bordered table-dark" id="search-results">
+                    <thead>
+                        <tr>
+                            <th><h5>S.No</h5></th>
+                            <th><h5>Protein Name</h5></th>
+                            <th><h5>Edit</h5></th>
+                            <th><h5>Delete</h5></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                        <tr>
+                            <td style="color:black;">{{ forloop.counter }}</td>
+                            <td><a href="{% url 'proteins_detail' item.id %}">{{ item.title }}</a></td>
+                            <td><button class="btn btn-primary"><a href="{% url 'update_protein' item.id %}" class="text-white">Edit</a></button></td>
+                            <td><button class="btn btn-danger"><a href="{% url 'delete_protein' item.id %}" class="text-white">Delete</a></button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            // Existing JavaScript for search functionality
+            $(document).ready(function () {
+                function filterTable() {
+                    var value = $("#search-input").val().toLowerCase();
+                    $("#search-results tbody tr").filter(function () {
+                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                    });
+                }
+                $("#search-input").on("keyup", function () {
+                    filterTable();
+                });
+                $(".search-button").on("click", function () {
+                    filterTable();
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

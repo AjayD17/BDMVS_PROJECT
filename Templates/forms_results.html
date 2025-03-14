@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Results</title>
+    <style>
+        .key-value-pair {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1vh;
+        }
+
+        .key {
+            font-weight: bold;
+            width: 150px;
+            flex-shrink: 0;
+        }
+
+        .value {
+            flex-grow: 1;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-md-8 mt-3">
+                <h1 style="color:blue;">{{ title }}</h1>
+                <h3 style="color:red;">Description:</h3>
+                <p>{{ description }}</p>
+                <h5 style="font-weight: bold; margin-bottom: 3vh; color:brown;">{{ subtitle }}</h5>
+
+                <div>
+                    {% for item1 in subcontent %}
+                        <div class="key-value-pair">
+                            <div class="key">{{ item1.key }}</div>
+                            <div class="value">{{ item1.value }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+            </div>
+    
+            <div class="col-md-4">
+                <img src="{% static 'Images/' %}{{ image }}" style="max-width: 100%;">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

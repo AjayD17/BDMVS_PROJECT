@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Category</title>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'Jquery/jquery.min.js' %}"></script>
+    <!-- Bootstrap JS (should be placed before closing </body> tag) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #6dd5ed, #2193b0);
+            padding-top: 0px;
+            margin-bottom:5vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width:190vh;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .search-container select,
+        .search-container input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+
+        .add-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #FF9800;;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .add-button:hover {
+            background-color: #FF9800;
+        }
+
+        #search-results {
+            margin-top: 20px;
+        }
+
+        #search-results th, #search-results td {
+            text-align: center;
+            padding: 10px;
+        }
+
+        #search-results tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #search-results tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        #search-results a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        #search-results a:hover {
+            text-decoration: underline;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        /* Hover effect for table rows */
+        tr:hover {
+            background-color: #b3e5fc; /* Soft light blue */
+            transition: 0.3s;
+        }
+        .text-danger {
+            text-align: center;
+            font-size: 18px;
+            color: red;
+        }
+
+        .search-box {
+            width: 250px;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            padding-top: 1vh;
+            padding-bottom: 1vh;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        .navbar a:hover {
+            color: #ffc107;
+        }
+
+        .navbar-brand {
+            color: white;
+            font-weight: bold;
+        }
+
+        .navbar-nav {
+            margin-left: auto;
+        }
+
+        /* Style for Active Page */
+        .nav-item.active .nav-link {
+            color: #ffc107 !important;
+        }
+
+        .bio-images img {
+            width: 100%;
+            height: auto;
+            max-width: 300px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+
+        .custom-dropdown {
+            margin-right: 20px;
+            margin-top: 10px;
+        }
+
+        .profile-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            font-size: 2.5vh;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            border: 3px solid #007bff;
+            margin: auto;
+        }
+
+        .truncate-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 800px; 
+            white-space: normal;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .selected {
+            background-color: skyblue !important; /* Light grey background */
+            color: #000; /* Change text color if needed */
+        }
+
+        .dropdown-menu {
+            margin-right: 110vh !important;
+            max-width:15vh;
+            margin-left:2.5vh;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            display: none;
+            float: left;
+            min-width: 6rem;
+            font-size: 2.4vh;
+            color: #212529;
+            text-align: left;
+            list-style: none;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, .15);
+            border-radius: .25rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="margin-bottom: 4vh;">
+        <div class="container-fluid">
+            <a class="navbar-brand" style="color:black; font-size:3vh;" href="{% url 'home' %}"><img src="{% static 'Images/logo.png' %}" style="height:10vh;">BDMVS</a>
+            <button class="navbar-toggler bg-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <!-- Home Link -->
+                    <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+                        <a class="nav-link" href="/" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">Home</a>
+                    </li>
+                    <!-- About Link -->
+                    <li class="nav-item {% if request.path == '/about/' %}active{% endif %}">
+                        <a class="nav-link" href="/about/" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">About</a>
+                    </li>
+
+                    {% if user.is_authenticated %}
+                    <!-- Profile Dropdown (Settings and Logout) -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" 
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" 
+                                    class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; cursor: pointer;">
+                            {% else %}
+                                <div id="profileImagePlaceholder" class="profile-placeholder">
+                                    {{ user.username|first|upper }} <!-- Display First Letter of Username -->
+                                </div>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="navbarDropdown">
+                            <li><a class="pl-2" href="{% url 'profile' %}">Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="pl-1" href="{% url 'settings' %}">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="pl-2" href="{% url 'logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                    
+                    {% else %}
+                    <!-- Login Link -->
+                    <li class="nav-item {% if request.path == '/login/' %}active{% endif %}">
+                        <a class="nav-link" href="{% url 'signin' %}" style="font-size:2.5vh; margin-top: 1vh;">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container w-100">
+        <div class="row">
+            <div class="col-12">
+                {% if user.is_authenticated %}
+                <div class="search-container">
+                    <form id="categoryForm" method="get">
+                        <select name="category" id="categorySelect">
+                            <option value="protein" {% if category == 'protein' %}selected{% endif %}>Protein</option>
+                            <option value="genome" {% if category == 'genome' %}selected{% endif %}>Genome</option>
+                            <option value="nucleotide" {% if category == 'nucleotide' %}selected{% endif %}>Nucleotide</option>
+                            <option value="taxonomy" {% if category == 'taxonomy' %}selected{% endif %}>Taxonomy</option>
+                            <option value="pubchem" {% if category == 'pubchem' %}selected{% endif %}>Pubchem</option>
+                            <option value="blast" {% if category == 'blast' %}selected{% endif %}>Blast</option>
+                            <option value="general" {% if category == 'general' %}selected{% endif %}>Category</option>
+                        </select>
+                    </form>                    
+                    <input type="text" class="search-box" placeholder="Enter your search..." id="search-input">
+                    <button class="search-button bg-success">Search</button>
+                </div>
+                    <div class="d-flex flex-row justify-content-end mr-5">
+                        {% if user.username == "admin" %}
+                            <a href="{% url 'new_file' %}"><button class="add-button"> Add </button></a>
+                        {% endif %}
+                    </div>
+                    <div class="col-12">
+                        {% if data %}
+                        <div class="content-box">
+                            <table class="table table-bordered table-dark" id="search-results">
+                                <thead class="text-center">
+                                    <tr style="font-size:19px;">
+                                        <th>S.No</th>
+                                        {% if category == 'general' %}<th>All Databases</th>
+                                        {% elif category == 'protein' %}<th>Protein Name</th>
+                                        {% elif category == 'genome' %}<th>Genome Name</th>
+                                        {% elif category == 'nucleotide' %}<th>Nucleotide Name</th>
+                                        {% elif category == 'taxonomy' %}<th>Taxonomy Name</th>
+                                        {% elif category == 'pubchem' %}<th>Pubchem Compound Name</th>
+                                        {% elif category == 'blast' %}<th>Blast Name</th>
+                                        {% endif %}
+                                        <th>Description</th>
+                                        {% if user.username == "admin" %}
+                                            <th>Edit</th>
+                                            <th>Delete</th>
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in data %}
+                                    <tr class="table-row">
+                                        <td style="color:black; text-decoration: none;" class="pt-4">{{ forloop.counter }}</td>
+                                        <td class="pt-4"><a href="{% url 'Databases_detail' item.id %}" style="text-decoration: none; color: black;">{{ item.title }}</a></td>
+                                        <td class="text-center">
+                                            <a href="{% url 'Databases_detail' item.id %}" class="truncate-text" style="text-decoration: none; color: black;">
+                                                {{ item.description }}
+                                            </a>
+                                        </td>
+                                        {% if user.username == "admin" %}
+                                            <td><button class="btn mt-1" style="background-color: darkmagenta;"><a href="{% url 'update_protein' item.id %}" class="text-white">Edit</a></button></td>
+                                            <td><button class="btn btn-danger mt-1"><a href="{% url 'delete_protein' item.id %}" class="text-white">Delete</a></button></td>
+                                        {% endif %}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                            <p class="text-center text-danger">
+                                {% if category == 'protein' %}
+                                    No protein data available.
+                                {% elif category == 'taxonomy' %}
+                                    No taxonomy data available.
+                                {% elif category == 'genome' %}
+                                    No genome data available.
+                                {% elif category == 'nucleotide' %}
+                                    No nucleotide data available.
+                                {% elif category == 'pubchem' %}
+                                    No pubchem data available.
+                                {% elif category == 'blast' %}
+                                    No blast data available.
+                                {% elif category == 'general' %}
+                                    No data available for the selected category.
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+                    
+                    {% else %}
+                        <p class="text-center text-danger">Please log in to see the search results.</p>
+                        <div class="d-flex justify-content-center">
+                            <a href="{% url 'signin' %}">
+                                <button class="btn btn-primary">Login</button>
+                            </a>
+                        </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+    // Submit the form when the category is changed
+    $("#categorySelect").on("change", function () {
+        $("#categoryForm").submit();
+    });
+
+    // Function to filter table rows based on search input
+    function filterTable() {
+        var value = $("#search-input").val().toLowerCase();
+        $("#search-results tbody tr").each(function () {
+            var rowText = $(this).text().toLowerCase(); // Search through the entire row
+            $(this).toggle(rowText.indexOf(value) > -1);
+        });
+    }
+
+    // Apply filter when user types in the search box
+    $("#search-input").on("keyup", function () {
+        filterTable();
+    });
+
+    // Apply filter when search button is clicked
+    $(".search-button").on("click", function () {
+        filterTable();
+    });
+
+    // Hide alert messages after 4 seconds
+    $(".alert").fadeOut(4000);
+    });
+
+
+
+    let currentIndex = 0;
+        const rows = document.querySelectorAll('.table-row');
+
+        function moveSelection(direction) {
+            rows[currentIndex].classList.remove('selected'); // Remove highlight
+            // Update index and loop if necessary
+            currentIndex += direction;
+            if (currentIndex < 0) currentIndex = rows.length - 1;
+            if (currentIndex >= rows.length) currentIndex = 0;
+            rows[currentIndex].classList.add('selected'); // Highlight new row
+        }
+
+        // Event listener for key presses
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowUp') {
+                moveSelection(-1);
+            } else if (event.key === 'ArrowDown') {
+                moveSelection(1);
+            } else if (event.key === 'Enter') {
+                // Get the selected row and extract the URL from the <a> tag
+                const selectedRow = rows[currentIndex];
+                const link = selectedRow.querySelector('a'); // Find the <a> tag inside the row
+                if (link) {
+                    window.location.href = link.href; // Redirect to the database detail page
+                }
+            }
+        });
+
+        // Initial highlight
+        rows[currentIndex].classList.add('selected');
+
+        // Add click event to select a row when clicked
+        rows.forEach((row, index) => {
+            row.addEventListener('click', function() {
+                rows[currentIndex].classList.remove('selected'); // Remove old selection
+                currentIndex = index; // Set new selected index
+                row.classList.add('selected'); // Apply selection style
+            });
+        });
+
+    </script>
+</body>
+</html>

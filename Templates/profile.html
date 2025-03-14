@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="{% static 'Jquery/jquery.min.js' %}"></script>
+</head>
+<style>
+    body {
+        background: linear-gradient(to right, #6dd5ed, #2193b0);
+    }
+
+    .settings-card {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: auto;
+    }
+
+    .profile-pic {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #007bff;
+    }
+
+    .edit-btn, .save-btn {
+        margin-top: 10px;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .edit-btn {
+        background-color: #da703f;
+        color: white;
+    }
+
+    .edit-btn:hover {
+        background-color: #5a6268;
+    }
+
+    .save-btn {
+        background-color: #007bff;
+        color: white;
+        display: none;
+    }
+
+    .save-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .profile-placeholder {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: white;
+        font-size: 3vh;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        border: 3px solid #007bff;
+        margin: auto;
+    }
+
+    .center-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: white;
+            text-decoration: none;
+        }
+
+        .center-link:hover {
+            text-decoration: underline;
+        }
+
+</style>
+<body class="mb-5">
+    <!-- Navbar -->
+    {% include "navbar.html" %}
+
+    <!-- Settings Page Content -->
+    <div class="container">
+        <div class="settings-card bg-dark mt-4">
+            <h2 class="text-center text-white">Profile Account</h2>
+            
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Profile Picture -->
+                <div class="text-center">
+                    {% if user.profile.profile_picture %}
+                        <img id="profileImage" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-pic">
+                    {% else %}
+                        <div id="profileImagePlaceholder" class="profile-placeholder">
+                            {{ user.username|first|upper }} <!-- Display First Letter of Username -->
+                        </div>    
+                    {% endif %}
+                    <br>
+                    <label for="profile_picture" class="edit-btn">
+                        <i class="fas fa-pencil-alt"></i> Edit Picture
+                    </label>
+                    <input type="file" id="profile_picture" name="profile_picture" class="d-none" accept="image/*">
+                </div>                
+
+                <!-- Editable Username -->
+                <div class="mb-3">
+                    <label for="username" class="form-label text-white">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" disabled>
+                </div>
+
+                <!-- Email Field -->
+                <div class="mb-3">
+                    <label for="email" class="form-label text-white">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" disabled>
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-3">
+                    <label for="password" class="form-label text-white">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter new password" value="{{ user.password }}" disabled>
+                </div>
+
+                <!-- Buttons -->
+                <button type="button" id="editButton" class="btn edit-btn bg-primary w-100 text-white" style="font-size:2.5vh;"><b>Edit</b></button>
+                <button type="submit" id="saveButton" class="btn save-btn bg-success w-100 text-white" style="font-size:2.5vh;"><b>Save</b></button>
+            </form>
+
+            <a href="{% url 'search_category' %}" class="center-link mb-3"><b>Back to Home Page</b></a>
+        </div>
+    </div>    
+
+    <script>
+        document.getElementById('editButton').addEventListener('click', function() {
+            document.getElementById('username').disabled = false;
+            document.getElementById('email').disabled = false;
+            document.getElementById('password').disabled = false;
+            document.getElementById('editButton').style.display = 'none';
+            document.getElementById('saveButton').style.display = 'block';
+        });
+
+        document.getElementById('profile_picture').addEventListener('change', function(event) {
+            let reader = new FileReader();
+            reader.onload = function() {
+                let imgElement = document.getElementById('profileImage');
+                if (imgElement) {
+                    imgElement.src = reader.result;
+                } else {
+                    let placeholder = document.getElementById('profileImagePlaceholder');
+                    placeholder.innerHTML = "";
+                    let newImg = document.createElement("img");
+                    newImg.src = reader.result;
+                    newImg.classList.add("profile-pic");
+                    newImg.id = "profileImage";
+                    placeholder.replaceWith(newImg);
+                }
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        });
+    </script>
+</body>
+</html>

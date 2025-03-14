@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload and View JSON</title>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <style>
+        /* General Styling */
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 80%;
+            margin: auto;
+            padding-top: 40px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #007bff;
+        }
+
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .nav-link {
+            color: white !important;
+        }
+
+        /* Card Styling */
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 20px;
+        }
+
+        /* Form Styling */
+        .form-control {
+            border-radius: 5px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            margin-top: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        td {
+            background-color: #f8f9fa;
+        }
+
+        a.text-primary {
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a.text-primary:hover {
+            text-decoration: underline;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">JSON Manager</a>
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'upload_json' %}">Upload</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Upload JSON File</h1>
+
+        <div class="card p-4">
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="file" name="file" accept=".json" required class="form-control mb-3">
+                <input type="submit" value="Upload File" class="btn btn-primary">
+            </form>
+        </div>
+
+        {% if table_data %}
+        <div class="mt-4">
+            <h2>Uploaded Data</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Title</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in table_data %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <a href="{% url 'json_detail' row.id %}" class="text-primary">
+                                {{ row.title }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'json_edit' row.id %}" class="btn btn-primary btn-sm">Edit</a>
+                        </td>
+                        <td>
+                            <form action="{% url 'json_delete' row.id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

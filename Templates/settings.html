@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Settings</title>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'Jquery/jquery.min.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<style>
+    /* Reset & Basic Styling */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+
+    /* Dashboard Layout */
+    .dashboard-container {
+        display: flex;
+        width: 100%;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 250px;
+        background-color: #222;
+        color: white;
+        padding: 20px;
+        height: 100vh;
+    }
+
+    .sidebar h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .sidebar ul li {
+        padding: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .sidebar ul li:hover {
+        background-color: green;
+    }
+
+    /* Content Area */
+    .content {
+        flex: 1;
+        padding: 20px;
+        background: linear-gradient(to right, #6dd5ed, #2193b0);
+    }
+
+    /* Settings Sections */
+    .settings-content {
+        display: none;
+    }
+
+    .settings-content.active {
+        display: block;
+    }
+
+    /* Dark Mode */
+    .dark-mode {
+        background-color: #222;
+        color: white;
+    }
+
+    .dark-mode .content {
+        background-color: #333;
+    }
+
+    .center-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 16px;
+        color: blue;
+        text-decoration: none;
+    }
+
+    .center-link:hover {
+        text-decoration: underline;
+    }
+</style>
+<body>
+    <!-- Navbar -->
+    {% include "navbar.html" %}
+    <div class="dashboard-container" style="background-color: #222;">
+        <!-- Sidebar Menu -->
+        <aside class="sidebar">
+            <h2>Settings</h2>
+            <ul>
+                <li onclick="showContent('security')">🔒 Login & Security</li>
+                <li onclick="showContent('terms')">📜 Terms & Conditions</li>
+                <li onclick="showContent('datetime')">📅 Date & Time</li>
+                <li onclick="showContent('theme')">🎨 Theme</li>
+                <li onclick="showContent('feedback')">💬 Give Feedback</li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Login & Security (Default Section) -->
+            <section id="security" class="settings-content active">
+                <div class="container mt-4 d-flex justify-content-center">
+                    <div class="col-md-6 p-4 rounded shadow-lg bg-dark">
+                        <h2 class="text-center text-primary mb-4">
+                            <i class="fas fa-lock"></i> <b>Login & Security</b>
+                        </h2>
+                        <p class="text-center text-warning">Manage your login credentials and security settings.</p>
+            
+                        <!-- Current Password -->
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label text-white">
+                                <i class="fas fa-lock"></i> Current Password
+                            </label>
+                            <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+                        </div>
+            
+                        <!-- New Password -->
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label text-white">
+                                <i class="fas fa-key"></i> New Password
+                            </label>
+                            <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+                        </div>
+            
+                        <!-- Confirm Password -->
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label text-white">
+                                <i class="fas fa-check"></i> Confirm Password
+                            </label>
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+                        </div>
+            
+                        <!-- Save Changes Button -->
+                        <button class="btn btn-success w-100" id="saveSecurity">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Terms & Conditions Section -->
+            <section id="terms" class="settings-content">
+                <h2>📜 Terms & Conditions</h2>
+
+                <ol class="list-group">
+                    <li class="list-group-item">
+                        <h5 class="text-info">1. Introduction</h5>
+                        <p>Welcome to our platform. By accessing and using this service, you agree to comply with and be bound by these Terms & Conditions.</p>
+                    </li>
+
+                    <li class="list-group-item">
+                        <h5 class="text-info">2. User Accounts</h5>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success"></i> Users must provide accurate and complete information during registration.</li>
+                            <li><i class="fas fa-check-circle text-success"></i> Users are responsible for maintaining the confidentiality of their account credentials.</li>
+                            <li><i class="fas fa-check-circle text-success"></i> We reserve the right to terminate accounts found to be in violation of our policies.</li>
+                        </ul>
+                    </li>
+
+                    <li class="list-group-item">
+                        <h5 class="text-info">3. Acceptable Use</h5>
+                        <p>Users must not engage in any activity that:</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-ban text-danger"></i> Violates any applicable laws or regulations.</li>
+                            <li><i class="fas fa-ban text-danger"></i> Infringes upon intellectual property rights.</li>
+                            <li><i class="fas fa-ban text-danger"></i> Attempts to disrupt the security or integrity of the platform.</li>
+                        </ul>
+                    </li>
+
+                    <li class="list-group-item">
+                        <h5 class="text-info">4. Privacy Policy</h5>
+                        <p>Your use of our service is also governed by our <a href="#" class="text-danger fw-bold">Privacy Policy</a>, which outlines how we collect and use your data.</p>
+                    </li>
+
+                    <li class="list-group-item">
+                        <h5 class="text-info">5. Service Modifications</h5>
+                        <p>We reserve the right to modify or discontinue any part of our services without prior notice.</p>
+                    </li>
+
+                    <li class="list-group-item">
+                        <h5 class="text-info">6. Limitation of Liability</h5>
+                        <p>We shall not be held responsible for any damages resulting from the use of our platform, including but not limited to data loss or service interruptions.</p>
+                    </li>
+
+                    <li class="list-group-item">
+                        <h5 class="text-info">7. Governing Law</h5>
+                        <p>These Terms & Conditions shall be governed by and interpreted in accordance with the laws of [Your Country/Region].</p>
+                    </li>
+
+                    <li class="list-group-item">
+                        <h5 class="text-info">8. Changes to Terms</h5>
+                        <p>We reserve the right to update these terms at any time. Users will be notified of significant changes.</p>
+                    </li>
+
+                    <li class="list-group-item">
+                        <h5 class="text-info">9. Contact Information</h5>
+                        <p>If you have any questions about these Terms & Conditions, please contact us at 
+                            <a href="mailto:support@example.com" class="fw-bold text-danger">support@example.com</a>.
+                        </p>
+                    </li>
+                </ol>
+
+                <button class="btn btn-success w-100 mt-3 fw-bold" onclick="acceptTerms()">Accept Terms</button>
+            </section>
+
+            <section id="datetime" class="settings-content"> 
+                <div class="container mt-5 d-flex justify-content-center">
+                    <div class="col-md-8 p-4 rounded shadow bg-secondary">
+                        <h2 class="text-center text-white mb-4">
+                            <i class="fas fa-clock"></i> Date, Time & Language Settings
+                        </h2>            
+            
+                        <!-- Edit All Settings -->
+                        <div class="mb-4">
+                            <h5 class="d-flex flex-row justify-content-center text-white"><i class="fas fa-edit"></i> Edit Settings</h5>
+                            <input type="date" class="form-control mb-2" id="edit-date" value="{{ settings.date }}" disabled>
+                            <input type="time" class="form-control mb-2" id="edit-time" value="{{ settings.time }}" disabled>
+            
+                            <select class="form-control mb-2" id="timezone-select" disabled>
+                                <option value="UTC" {% if settings.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                                <option value="Asia/Kolkata" {% if settings.timezone == 'Asia/Kolkata' %}selected{% endif %}>IST</option>
+                                <option value="America/New_York" {% if settings.timezone == 'America/New_York' %}selected{% endif %}>EST</option>
+                                <option value="Europe/London" {% if settings.timezone == 'Europe/London' %}selected{% endif %}>GMT</option>
+                                <option value="Asia/Tokyo" {% if settings.timezone == 'Asia/Tokyo' %}selected{% endif %}>JST</option>
+                            </select>
+            
+                            <select class="form-control mb-2" id="language-select" disabled>
+                                <option value="en" {% if settings.language == 'en' %}selected{% endif %}>English</option>
+                                <option value="es" {% if settings.language == 'es' %}selected{% endif %}>Spanish</option>
+                                <option value="fr" {% if settings.language == 'fr' %}selected{% endif %}>French</option>
+                                <option value="de" {% if settings.language == 'de' %}selected{% endif %}>German</option>
+                                <option value="zh" {% if settings.language == 'zh' %}selected{% endif %}>Chinese</option>
+                            </select>
+            
+                            <button class="btn btn-warning mt-3 w-100" id="edit-save-button" onclick="toggleEdit()">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            </section>   
+
+            <!-- Theme -->
+            <section id="theme" class="settings-content">
+                <h2>Theme</h2>
+                <p>Choose between Light and Dark mode.</p>
+                <button onclick="toggleTheme()">Switch Theme</button>
+            </section>
+
+            <!-- Feedback -->
+            <section id="feedback" class="settings-content">
+                <h2>Give Feedback</h2>
+                <textarea id="feedbackBox" placeholder="Write your feedback..." rows="6" class="form-control">{{ settings.feedback }}</textarea><br>
+                <button class="btn btn-primary" onclick="submitFeedback()">Submit</button>
+            </section>     
+        </main>
+    </div>
+
+    <script>
+        // Login & Security:
+        document.getElementById("saveSecurity").addEventListener("click", function() {
+            let currentPassword = document.getElementById("currentPassword").value;
+            let newPassword = document.getElementById("newPassword").value;
+            let confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (newPassword !== confirmPassword) {
+                alert("New Password and Confirm Password do not match!");
+                return;
+            }
+
+            fetch("/update-password/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken")  // CSRF protection for Django
+                },
+                body: JSON.stringify({
+                    "current_password": currentPassword,
+                    "new_password": newPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => console.error("Error:", error));
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                let cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    let cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Terms & conditions:
+        function showContent(sectionId) {
+            document.querySelectorAll('.settings-content').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function acceptTerms() {
+            alert("You have accepted the Terms & Conditions.");
+        }
+
+        // Theme:
+        function toggleTheme() {
+            // Toggle the 'dark-mode' class on the body element
+            document.body.classList.toggle('dark-mode');
+            
+            // Change button text based on the theme
+            let themeButton = document.querySelector('#theme button');
+            if (document.body.classList.contains('dark-mode')) {
+                themeButton.textContent = 'Switch to Light Mode';
+            } else {
+                themeButton.textContent = 'Switch to Dark Mode';
+            }
+        }
+
+        function toggleEdit() {
+            // Enable input fields
+            document.getElementById("edit-date").disabled = false;
+            document.getElementById("edit-time").disabled = false;
+            document.getElementById("timezone-select").disabled = false;
+            document.getElementById("language-select").disabled = false;
+
+            // Change button text to "Save"
+            let button = document.getElementById("edit-save-button");
+            button.innerText = "Save";
+            button.classList.remove("btn-warning");
+            button.classList.add("btn-success");
+
+            // Change onclick function to saveSettings()
+            button.setAttribute("onclick", "saveSettings()");
+        }
+
+        function saveSettings() {
+            let date = document.getElementById("edit-date").value;
+            let time = document.getElementById("edit-time").value;
+            let timezone = document.getElementById("timezone-select").value;
+            let language = document.getElementById("language-select").value;
+
+            fetch("{% url 'save_settings' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"  // Django CSRF Token
+                },
+                body: JSON.stringify({
+                    date: date,
+                    time: time,
+                    timezone: timezone,
+                    language: language
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert("Error updating settings: " + data.error);
+                    location.reload(); // Refresh page to show updated settings
+                } else {
+                    alert("Settings updated successfully...");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function submitFeedback() {
+            let feedbackText = document.getElementById("feedbackBox").value;
+
+            fetch("{% url 'submit_feedback' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"  // Django CSRF Token
+                },
+                body: JSON.stringify({
+                    feedback: feedbackText
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert("Feedback submitted successfully!");
+                } else {
+                    alert("Error submitting feedback: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>

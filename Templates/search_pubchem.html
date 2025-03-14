@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search PubChem</title>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'Jquery/jquery.min.js' %}"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 30px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .search-container select,
+        .search-container input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+
+        .add-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-button:hover {
+            background-color: #218838;
+        }
+
+        #search-results {
+            margin-top: 20px;
+        }
+
+        #search-results th, #search-results td {
+            text-align: center;
+            padding: 10px;
+        }
+
+        #search-results tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #search-results tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        #search-results a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        #search-results a:hover {
+            text-decoration: underline;
+        }
+
+        .table-bordered {
+            border: 1px solid #ccc;
+        }
+
+        .table-dark {
+            background-color: #343a40;
+            color: white;
+        }
+
+        .text-danger {
+            text-align: center;
+            font-size: 18px;
+            color: red;
+        }
+
+        .search-box {
+            width: 250px;
+        }
+
+        .navbar {
+            background-color: #343a40;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        .navbar a:hover {
+            color: #ffc107;
+        }
+
+        .navbar-brand {
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Align navbar links to the right */
+        .navbar-nav {
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="margin-bottom:7vh;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">BDMVS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about/">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login/">Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="search-container">
+                    <form id="categoryForm" >
+                        <select name="category" id="categorySelect">
+                            <option value="protein">Protein</option>
+                            <option value="genome">Genome</option>
+                            <option value="nucleotide">Nucleotide</option>
+                            <option value="taxonomy">Taxonomy</option>
+                            <option value="pubchem" selected>Pubchem</option>
+                            <option value="blast">BLAST</option>
+                            <option value="general">Category</option>
+                        </select>
+                    </form>
+                    <input type="text" class="search-box" placeholder="Enter your search..." id="search-input">
+                    <button class="search-button">Search</button>
+                </div>
+                <div class="d-flex flex-row justify-content-end mr-5">
+                    <a href="{% url 'new_file' %}"><button class="add-button"> Add </button></a>
+                </div>
+            </div>
+            <div class="col-12">
+                <!-- Table for search results -->
+                {% if data %}
+                <table class="table table-bordered table-dark" id="search-results">
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>PubChem Result</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td><a href="{% url 'Databases_detail' item.id %}">{{ item.title }}</a></td>
+                            <td><button class="btn btn-primary"><a href="{% url 'update_pubchem' item.id %}" class="text-white">Edit</a></button></td>
+                            <td><button class="btn btn-danger"><a href="{% url 'delete_pubchem' item.id %}" class="text-white">Delete</a></button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-center text-danger">No PubChem data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for search functionality
+        $(document).ready(function () {
+            function filterTable() {
+                var value = $("#search-input").val().toLowerCase();
+                $("#search-results tbody tr").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            }
+            $("#search-input").on("keyup", function () {
+                filterTable();
+            });
+            $(".search-button").on("click", function () {
+                filterTable();
+            });
+        });
+
+        document.getElementById("categorySelect").addEventListener("change", function() {
+            let category = this.value;
+            window.location.href = `/search_${category}/`;
+        });
+    </script>
+</body>
+</html>

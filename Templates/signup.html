@@ -1,0 +1,217 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Signup</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+    /* General Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  display: flex;
+  width: 90%;
+  height: 95vh;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Left Section (Login) */
+.left-section {
+  width: 40%;
+  background-color: #0fcaa7;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+.left-section h2 {
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.left-section p {
+  margin-bottom: 20px;
+}
+
+.left-section button {
+  padding: 12px 30px;
+  background-color: white;
+  color: #0fcaa7;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-radius: 25px;
+}
+
+.left-section button:hover {
+  background-color: #0dc297;
+  color: white;
+}
+
+/* Right Section (Signup) */
+.right-section {
+  width: 60%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top:3vh;
+}
+
+.right-section h2 {
+  color: #0fcaa7;
+  margin-bottom: 20px;
+}
+
+.right-section form {
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+}
+
+.right-section label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.right-section input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  transition: border 0.3s;
+}
+
+.right-section input:focus {
+  border-color: #0fcaa7;
+  outline: none;
+}
+
+.right-section button {
+  padding: 12px;
+  background-color: #0fcaa7;
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 25px;
+  transition: background-color 0.3s;
+}
+
+.right-section button:hover {
+  background-color: #0dc297;
+}
+
+/* Social Media Icons */
+.social-icons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.social-icons a {
+  text-decoration: none;
+  font-size: 18px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.social-icons a:hover {
+  background-color: #0fcaa7;
+  color: white;
+  border-color: #0fcaa7;
+}
+
+/* Mobile View */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .left-section, .right-section {
+    width: 100%;
+    padding: 30px;
+  }
+}
+
+</style>
+<body>
+    <div class="container">
+        <!-- Left Section (Login) -->
+        <div class="left-section">
+            <h2>Welcome Back!</h2>
+            {% if welcome_message %}
+                <p>Welcome Back!</p>
+            {% else %}
+                <p>To keep connected with us please login with your personal info</p>
+                <button type="form"><a href="{% url 'signin' %}" style="text-decoration: none; color:black; font-weight: bold;">SIGN IN</a></button>
+            {% endif %}
+        </div>
+
+        <!-- Right Section (Signup) -->
+        <div class="right-section">
+            <h2>Create Account</h2>
+            
+            <form method="POST" action="{% url 'signup' %}" enctype="multipart/form-data">
+              {% csrf_token %}
+              <label for="username">Username:</label>
+              <input type="text" name="username" required>
+          
+              <label for="email">Email:</label>
+              <input type="email" name="email" required>
+          
+              <label for="phone_number">Phone Number:</label>
+              <input type="text" name="phone_number">
+          
+              <label for="profile_picture">Profile Picture:</label>
+              <input type="file" name="profile_picture">
+          
+              <label for="password1">Password:</label>
+              <input type="password" name="password1" required>
+          
+              <label for="password2">Confirm Password:</label>
+              <input type="password" name="password2" required>
+          
+              <button type="submit"><b>SIGN UP</b></button>
+          </form>
+          
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ json_data.title }}</title>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <style>
+        /* General Styling */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            max-width: 70%;
+            margin: auto;
+            padding-top: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #007bff;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        h3 {
+            color: #343a40;
+            font-size: 22px;
+            margin-top: 15px;
+        }
+
+        h4 {
+            color: #495057;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .btn-secondary {
+            display: block;
+            width: 150px;
+            margin: 20px auto;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>{{ json_data.title }}</h1>
+            <h3>Category: {{ json_data.category }}</h3>
+            <p><strong>Description:</strong> {{ json_data.description }}</p>
+
+            <h4>{{ json_data.sub_title }}</h4>
+            <p>{{ json_data.subtitle_content }}</p>
+
+            <a href="{% url 'upload_json' %}" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+</body>
+</html>

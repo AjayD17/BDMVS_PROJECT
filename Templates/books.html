@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px 0;
+            background: linear-gradient(to right, #6dd5ed, #2193b0);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Centering the search form */
+        #searchForm {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #search_word {
+            padding: 8px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #loading {
+            display: none;
+            margin-top: 20px;
+        }
+
+        /* Box container for book results */
+        .box-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Styling each book result */
+        .book-result {
+    max-width: 1200px; /* Ensures it's not too wide */
+    width: 100%;
+    background-color: #e0e0e0;
+    margin-bottom: 2vh;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
+.book-cover {
+    width: 120px; /* Adjust width */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.book-info {
+    flex: 1;
+    padding-left: 15px;
+}
+
+
+        .book-info strong {
+            text-align: left;
+            display: block;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 5px;
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .book-result {
+                flex-direction: column;
+                text-align: center;
+                align-items: center;
+            }
+
+            .book-cover {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body style="margin-bottom:5vh">
+    {% include "navbar.html" %}
+    
+    <h2 style="margin-top: 4vh; color:white; text-shadow: 2px 2px 3px black;">Books on {{ category }}</h2>
+
+    <!-- Search Box -->
+    <form id="searchForm" method="GET" action="" style="margin-top:3vh">
+        <input type="text" id="search_word" name="q" placeholder="Search for books..." value="{{ request.GET.q }}" style="border:2px solid black;">
+        <button type="submit" style="border:1px solid white; color:white; border-radius:1vh;">Search</button>
+    </form>
+
+    <div id="loading">Loading...</div>
+
+    <div class="container d-flex flex-column align-items-center">
+        {% for book in books %}
+            <div class="book-result d-flex align-items-center p-3 justify-content-center">
+                <!-- Book Cover Image (Aligned Left) -->
+                <img src="{{ book.image.url }}" alt="{{ book.title }}" class="book-cover img-fluid">
+    
+                <!-- Book Info (Aligned Right) -->
+                <div class="book-info d-flex flex-column justify-content-center px-3">
+                    <h5 class="mb-2 pb-1 pt-1">{{ book.title }}</h5>
+                    <p class="mb-2 pb-1">{{ book.description }}</p>
+    
+                    <!-- Checking if book has files -->
+                    {% if book.files.all %}
+                        {% for file in book.files.all %}
+                            <a href="{{ file.file.url }}" class="btn btn-primary btn-sm my-1" style="max-width:100px; padding:1.2vh; font-size:2.3vh;" download>Download</a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No files available for this book.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>    
+
+    <!-- {% for book in books %}
+        <div class="book-result" style="border:2px solid black">
+            <img src="{{ book.image.url }}" alt="{{ book.title }}" class="book-cover" style="width:8%">
+            <div class="book-info">
+                <strong>{{ book.title }}</strong><br>
+                {{ book.description }} <br>
+
+                 Iterate over multiple files correctly -->
+                <!-- {% for file in book.files.all %}
+                    <button><a href="{{ file.file.url }}" download>Download</a></button><br>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %} --> 
+
+
+
+
+    
+
+    <script>
+        document.getElementById("searchForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            let searchWord = document.getElementById("search_word").value;
+            let resultsDiv = document.getElementById("results");
+            let loadingDiv = document.getElementById("loading");
+
+            resultsDiv.innerHTML = '';  // Clear previous results
+            loadingDiv.style.display = 'block';  // Show loading indicator
+
+            try {
+                let response = await fetch('/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ 'search_word': searchWord })
+                });
+
+                let data = await response.json();
+                loadingDiv.style.display = 'none';  // Hide loading indicator
+
+                if (data.status === "completed") {
+                    if (data.results.length === 0) {
+                        resultsDiv.innerHTML = "<p>No results found.</p>";
+                    } else {
+                        let fragment = document.createDocumentFragment();
+
+                        data.results.forEach(result => {
+                            let bookDiv = document.createElement("div");
+                            bookDiv.classList.add("book-result");
+
+                            bookDiv.innerHTML = `
+                                <img src="${result.book_cover}" alt="${result.book_name} cover" class="book-cover" loading="lazy">
+                                <div class="book-info">
+                                    <strong>${result.book_name}</strong>
+                                    <a href="${result.download_link}" target="_blank">Download/View</a>
+                                </div>
+                            `;
+
+                            fragment.appendChild(bookDiv);
+                        });
+
+                        resultsDiv.appendChild(fragment);
+                    }
+                } else if (data.error) {
+                    resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                resultsDiv.innerHTML = "<p>An error occurred while processing the request.</p>";
+            }
+        });
+    </script>
+</body>
+</html>

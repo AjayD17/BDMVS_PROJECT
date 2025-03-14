@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Files</title>
+</head>
+<body>
+    {% include "navbar.html" %}
+    
+    <h2>Upload Files</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Category Selection -->
+        <label for="category">Select Category:</label>
+        <select id="category" name="category" required>
+            <option value="">-- Select Category --</option>
+            {% for category, category_name in category_choices %}
+                <option value="{{ category }}">{{ category_name }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+
+        <!-- File Upload -->
+        <input type="file" name="files" multiple required>
+        <button type="submit">Upload Files</button>
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const categorySelect = document.getElementById("category");
+            const bookSelect = document.getElementById("book");
+
+            const books = JSON.parse('{{ books_json|safe }}');  // Load books from the Django context
+
+            categorySelect.addEventListener("change", function () {
+                const selectedCategory = categorySelect.value;
+                bookSelect.innerHTML = '<option value="">-- Select Book --</option>';
+
+                if (selectedCategory) {
+                    books[selectedCategory].forEach(book => {
+                        const option = document.createElement("option");
+                        option.value = book.id;
+                        option.textContent = book.title;
+                        bookSelect.appendChild(option);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

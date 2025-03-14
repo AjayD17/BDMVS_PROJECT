@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Security</title>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'Jquery/jquery.min.js' %}"></script>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<style>
+    .center-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: blue;
+            text-decoration: none;
+        }
+
+        .center-link:hover {
+            text-decoration: underline;
+        }
+</style>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2 bg-white p-4 rounded shadow">
+                <h2 class="text-center text-primary mb-4">
+                    <i class="fas fa-user-lock"></i> Login & Security
+                </h2>
+
+                <!-- Email Update Section -->
+                <div class="mb-4">
+                    <h5 class="text-info"><i class="fas fa-envelope"></i> Email Address</h5>
+                    <p class="text-muted">Your registered email: <strong>user@example.com</strong></p>
+                    <button class="btn btn-warning" onclick="updateEmail()">
+                        <i class="fas fa-edit"></i> Update Email
+                    </button>
+                </div>
+
+                <!-- Password Update Section -->
+                <div class="mb-4">
+                    <h5 class="text-info"><i class="fas fa-key"></i> Password</h5>
+                    <p class="text-muted">Ensure your password is strong and unique.</p>
+                    <button class="btn btn-danger" onclick="updatePassword()">
+                        <i class="fas fa-lock"></i> Change Password
+                    </button>
+                </div>
+
+                <!-- Two-Factor Authentication (2FA) -->
+                <div class="mb-4">
+                    <h5 class="text-info"><i class="fas fa-shield-alt"></i> Two-Factor Authentication (2FA)</h5>
+                    <p class="text-muted">Enhance your account security by enabling 2FA.</p>
+                    <button class="btn btn-success" onclick="enable2FA()">
+                        <i class="fas fa-toggle-on"></i> Enable 2FA
+                    </button>
+                </div>
+
+                <!-- Login Activity -->
+                <div class="mb-4">
+                    <h5 class="text-info"><i class="fas fa-history"></i> Login Activity</h5>
+                    <p class="text-muted">Recent login locations and devices.</p>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <i class="fas fa-laptop"></i> Chrome - Windows <span class="text-muted"> (Today, 10:30 AM)</span>
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-mobile-alt"></i> Safari - iPhone <span class="text-muted"> (Yesterday, 8:15 PM)</span>
+                        </li>
+                    </ul>
+                    <a href="{% url 'settings' %}" class="center-link mb-3"><b>Back</b></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateEmail() {
+            alert("Redirecting to update email page.");
+            window.location.href = "/update-email/";
+        }
+
+        function updatePassword() {
+            alert("Redirecting to change password page.");
+            window.location.href = "/change-password/";
+        }
+
+        function enable2FA() {
+            alert("Redirecting to enable Two-Factor Authentication.");
+            window.location.href = "/enable-2fa/";
+        }
+    </script>
+
+</body>
+</html>
