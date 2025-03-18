@@ -761,6 +761,54 @@ def books(request):
     return render(request, 'books.html', {'books': books, 'category': category})
 
 
+# from django.shortcuts import render
+# from django.http import JsonResponse
+# from django.conf import settings
+# from django.core.files import File
+# import os
+# from .models import Book  # Ensure you have imported your Book model
+
+# def books(request):
+#     """
+#     Fetches books from the database, filters them by category and search query,
+#     and ensures each book has a cover image.
+#     """
+#     category = request.GET.get('category', '')  
+#     query = request.GET.get('q', '')
+
+#     books = Book.objects.all().prefetch_related('files')
+
+#     if category:
+#         books = books.filter(category__iexact=category)
+
+#     if query:
+#         books = books.filter(title__icontains=query)
+
+#     # Ensure every book has a cover image
+#     for book in books:
+#         if not book.image or book.image.name == "covers/default_book.png":
+#             book_file = book.files.first()  # Get the first related file
+#             if book_file and book_file.file:
+#                 image_path = extract_first_page_image(book_file.file.path)
+#                 if image_path and image_path != book.image.name:
+#                     with open(os.path.join(settings.MEDIA_ROOT, image_path), "rb") as img_file:
+#                         book.image.save(os.path.basename(image_path), File(img_file), save=True)
+
+#     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#         book_list = [
+#             {
+#                 'title': book.title,
+#                 'category': book.category,
+#                 'image_url': book.image.url if book.image else '/media/covers/default_book.png'
+#             }
+#             for book in books
+#         ]
+#         return JsonResponse({'books': book_list})
+
+#     return render(request, 'books.html', {'books': books, 'category': category})
+
+
+
 import json
 from django.shortcuts import render, redirect
 from .models import Book, BookFile  # Ensure Book and BookFile models exist

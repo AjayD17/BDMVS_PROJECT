@@ -10,6 +10,7 @@
             text-align: center;
             margin: 50px 0;
             background: linear-gradient(to right, #6dd5ed, #2193b0);
+            margin-bottom:7vh;
         }
 
         h2 {
@@ -68,7 +69,7 @@
     width: 100%;
     background-color: #e0e0e0;
     margin-bottom: 2vh;
-    border: 1px solid #ccc;
+    border: 2px solid black;
     border-radius: 5px;
 }
 
@@ -119,7 +120,13 @@
 <body style="margin-bottom:5vh">
     {% include "navbar.html" %}
     
-    <h2 style="margin-top: 4vh; color:white; text-shadow: 2px 2px 3px black;">Books on {{ category }}</h2>
+    <h2 style="margin-top: 4vh; color:white; text-shadow: 2px 2px 3px black;">
+        {% if request.GET.q %}
+            Search Results for "{{ request.GET.q }}"
+        {% else %}
+            Books on {{ category }}
+        {% endif %}
+    </h2>      
 
     <!-- Search Box -->
     <form id="searchForm" method="GET" action="" style="margin-top:3vh">
@@ -136,7 +143,7 @@
                 <img src="{{ book.image.url }}" alt="{{ book.title }}" class="book-cover img-fluid">
     
                 <!-- Book Info (Aligned Right) -->
-                <div class="book-info d-flex flex-column justify-content-center px-3">
+                <div class="book-info d-flex flex-column justify-content-center px-4">
                     <h5 class="mb-2 pb-1 pt-1">{{ book.title }}</h5>
                     <p class="mb-2 pb-1">{{ book.description }}</p>
     
@@ -168,63 +175,42 @@
         </div>
     {% endfor %} --> 
 
+<script>
+    $(document).ready(function () {
+        function fetchBooks() {
+            let query = $('#search_word').val(); // Get search input
+            let category = "{{ category }}";  // Get the selected category (from Django context)
 
-
-
-    
-
-    <script>
-        document.getElementById("searchForm").addEventListener("submit", async function(event) {
-            event.preventDefault();
-
-            let searchWord = document.getElementById("search_word").value;
-            let resultsDiv = document.getElementById("results");
-            let loadingDiv = document.getElementById("loading");
-
-            resultsDiv.innerHTML = '';  // Clear previous results
-            loadingDiv.style.display = 'block';  // Show loading indicator
-
-            try {
-                let response = await fetch('/search', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ 'search_word': searchWord })
-                });
-
-                let data = await response.json();
-                loadingDiv.style.display = 'none';  // Hide loading indicator
-
-                if (data.status === "completed") {
-                    if (data.results.length === 0) {
-                        resultsDiv.innerHTML = "<p>No results found.</p>";
-                    } else {
-                        let fragment = document.createDocumentFragment();
-
-                        data.results.forEach(result => {
-                            let bookDiv = document.createElement("div");
-                            bookDiv.classList.add("book-result");
-
-                            bookDiv.innerHTML = `
-                                <img src="${result.book_cover}" alt="${result.book_name} cover" class="book-cover" loading="lazy">
-                                <div class="book-info">
-                                    <strong>${result.book_name}</strong>
-                                    <a href="${result.download_link}" target="_blank">Download/View</a>
+            $.ajax({
+                url: "{% url 'books' %}",  // Ensure you have a named URL for 'books' in Django
+                data: { q: query, category: category },
+                dataType: 'json',
+                success: function (response) {
+                    $('#book-list').empty(); // Clear previous results
+                    if (response.books.length > 0) {
+                        response.books.forEach(book => {
+                            $('#book-list').append(`
+                                <div class="book-result d-flex align-items-center p-3 justify-content-center">
+                                    <img src="${book.image_url}" alt="Cover" class="book-cover img-fluid">
+                                    <div class="book-info d-flex flex-column justify-content-center px-3">
+                                        <h5 class="mb-2 pb-1 pt-1">${book.title}</h5>
+                                        <p class="mb-2 pb-1">${book.description}</p>
+                                        ${book.download_link ? `<a href="${book.download_link}" class="btn btn-primary btn-sm my-1" download>Download</a>` : `<p class="text-muted">No files available</p>`}
+                                    </div>
                                 </div>
-                            `;
-
-                            fragment.appendChild(bookDiv);
+                            `);
                         });
-
-                        resultsDiv.appendChild(fragment);
+                    } else {
+                        $('#book-list').html("<p>No books found.</p>");
                     }
-                } else if (data.error) {
-                    resultsDiv.innerHTML = `<p>Error: ${data.error}</p>`;
                 }
-            } catch (error) {
-                loadingDiv.style.display = 'none';
-                resultsDiv.innerHTML = "<p>An error occurred while processing the request.</p>";
-            }
-        });
-    </script>
+            });
+        }
+
+        // Trigger search on typing
+        $('#search_word').on('input', fetchBooks);
+    });
+</script>
+
 </body>
 </html>
