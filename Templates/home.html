@@ -927,10 +927,19 @@ button:hover {
           <p style="text-align: justify; font-size: 3vh; padding-top:3vh;">
             Empowering biological research through seamless data management and visualization.
           </p>
-          <div class="search-container" style="padding-top: 3vh">
-            <input type="text" name="text" id="search-input" placeholder="Describe what you want to see" required>
-            <button type="submit" class="theme-btn btn-one" style="border-radius: 30px; font-size:2.7vh; padding-top:1.5vh; padding-bottom:1.5vh; color:white; background-color: #1b9c85;">Search</button>
-        </div>
+          <form id="searchForm" method="GET" 
+      action="{% url 'search' 'default' %}" 
+      onsubmit="this.action = this.action.replace('default', encodeURIComponent(document.getElementById('search_word').value.trim()))">
+      onsubmit="this.action = this.action.replace('default', document.getElementById('search_word').value)">
+    <input type="text" id="search_word" name="search_word" placeholder="Enter search word" required>
+    <button type="submit" class="theme-btn btn-one" style="border-radius: 30px; font-size:2.7vh; padding-top:1.5vh; padding-bottom:1.5vh; color:white; background-color: #1b9c85;">Search</button>
+  
+</form>
+
+        
+        
+        
+        
           <!-- <div class="">
             <input type="text" name="text" placeholder="Describe what you want to see" required>
             <button type="submit" class="theme-btn btn-one" style="color:#1b9c85; font-weight: bold; border-radius: 30px; font-size: 2.5vh; padding-top: 1vh; padding-bottom:1vh;">Search</button>

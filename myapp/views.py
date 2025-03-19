@@ -21,6 +21,12 @@ from django.db import IntegrityError
 from .models import UserSettings
 from django.http import JsonResponse
 from django.core.files.storage import default_storage
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+import fitz 
+import concurrent.futures
+import requests
+from django.http import JsonResponse, FileResponse
 
 def navbar(request):
     return render(request, "navbar.html")
@@ -915,5 +921,140 @@ def upload_files(request):
 
 #     return render(request, 'books.html', {'books': books, 'category': category})
 
+# Directory Setup
+PDF_DIR = os.path.join(settings.BASE_DIR, 'Books')
+COVERS_DIR = os.path.join(settings.BASE_DIR, 'media/covers')
+os.makedirs(PDF_DIR , exist_ok=True)
+os.makedirs(COVERS_DIR, exist_ok=True)
+
+# API keys
+YOUTUBE_API_KEY ="AIzaSyBCufM0BtHWa4QZ7-SXfva8bjbe95OntuM"  
+GOOGLE_API_KEY = "AIzaSyCq3Pui_oelRt1K2CTUIhDdHJocI2ruQhI" 
+CUSTOM_SEARCH_ENGINE_ID="c56f8f041442444b7"
+
+def search(request, search_word):
+    search_word = search_word.strip()
+
+    if not search_word:
+        return render(request, 'results.html', {"error": "Search word is required."})
+
+    # Continue with search logic...
+    pdf_files = [f for f in os.listdir(PDF_DIR) if f.endswith(".pdf")][:100]
+    
+    title_matched_books = [file for file in pdf_files if search_word.lower() in file.lower()]
+    youtube_results = search_youtube(search_word)
+
+    if title_matched_books:
+        results = [
+            {
+                "book_name": book.replace(".pdf", ""),
+                "book_cover": f"/media/covers/{book.replace('.pdf', '.png')}",
+                "download_link": f"/download/{book}"
+            } for book in title_matched_books
+        ]
+    else:
+        results = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            future_to_pdf = {
+                executor.submit(search_word_in_pdf, os.path.join(PDF_DIR, file), search_word): file
+                for file in pdf_files
+            }
+            for future in concurrent.futures.as_completed(future_to_pdf):
+                filename = future_to_pdf[future]
+                try:
+                    occurrences, cover_image = future.result()[1:3]
+                    if occurrences > 0:
+                        results.append({
+                            "book_name": filename.replace(".pdf", ""),
+                            "book_cover": cover_image,
+                            "download_link": f"/download/{filename}"
+                        })
+                except Exception:
+                    continue
+
+    google_results = google_search(search_word)
+
+    return render(request, 'results.html', {
+        "query": search_word,
+        "pdf_results": results,
+        "google_results": google_results,
+        "youtube_results": youtube_results
+    })
 
 
+def home(request):
+    return render(request, 'home.html')
+
+def google_search(query):
+    url = f"https://www.googleapis.com/customsearch/v1?q={query}&key={GOOGLE_API_KEY}&cx={CUSTOM_SEARCH_ENGINE_ID}"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        items = data.get("items", [])
+        return [
+            {
+                "title": item["title"],
+                "book_cover": "/static/default_image.png",
+                "download_link": item.get("link", "#")
+            }
+            for item in items[:5]
+        ]
+    except Exception:
+        return []
+
+
+# Extract first page cover image
+def extract_first_page_image(pdf_filename):
+    try:
+        doc = fitz.open(pdf_filename)
+        first_page = doc[0]
+        pix = first_page.get_pixmap(matrix=fitz.Matrix(2, 2))
+        cover_filename = os.path.splitext(os.path.basename(pdf_filename))[0] + ".png"
+        cover_path = os.path.join(COVERS_DIR, cover_filename)
+        pix.save(cover_path)
+        return f"/static/covers/{cover_filename}"
+    except Exception:
+        return "/static/default_cover.jpg"
+
+# Search word in PDFs
+def search_word_in_pdf(pdf_filename, search_word):
+    try:
+        doc = fitz.open(pdf_filename)
+        occurrences = sum(page.get_text("text").lower().count(search_word.lower()) for page in doc)
+        cover_image = extract_first_page_image(pdf_filename)
+        return pdf_filename, occurrences, cover_image
+    except Exception:
+        return pdf_filename, 0, None
+
+# YouTube API search
+def search_youtube(query):
+    url = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        "part": "snippet",
+        "q": query,
+        "type": "video",
+        "maxResults": 5,
+        "key": YOUTUBE_API_KEY
+    }
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+        return [
+            {
+                "title": item["snippet"]["title"],
+                "thumbnail": "/static/default_thumbnail.jpg",
+                "videoUrl": f"https://www.youtube.com/watch?v={item['id']['videoId']}"
+            }
+            for item in data.get("items", [])
+        ]
+    except Exception:
+        return []
+
+
+def download(request, book_name):
+    pdf_path = os.path.join(PDF_DIR, book_name)
+    if not os.path.exists(pdf_path):
+        return JsonResponse({"error": "File not found."}, status=404)
+    return FileResponse(open(pdf_path, 'rb'), as_attachment=True)

@@ -59,6 +59,11 @@ urlpatterns = [
     ## Books
     path('books/', views.books, name='books'),
     path('upload-book/', views.upload_files, name='upload_files'),
+    
+    ##search
+    path('', views.home, name='home'),
+    path('search/<str:search_word>/', views.search, name='search'),  # Updated URL for search
+    path('download/<str:book_name>/', views.download, name='download'),
 ]
 
 if settings.DEBUG:
