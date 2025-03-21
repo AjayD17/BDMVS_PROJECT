@@ -750,10 +750,10 @@ button:hover {
     background-color: #0056b3;
 }
 
-/* ✅ Main Container with Grid Layout */
+/* ✅ Main Container with Equal Column Layout */
 .container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Default: Three columns */
+    grid-template-columns: repeat(3, 1fr);  /* Three equal columns */
     gap: 20px;
     max-width: 1200px;
     margin: auto;
@@ -761,14 +761,17 @@ button:hover {
 
 /* ✅ Panels for Books, Google Results, and Videos */
 .panel {
-    padding: 15px;
+    padding: 0;  /* Remove extra padding */
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;  /* Ensures equal width */
+    height: 100%; /* Equal height for better alignment */
+    overflow-y: auto; /* Prevents content overflow issues */
 }
 
 /* ✅ Book, Google, and Video Result Styles */
-.book-result, .video-result, .google-result {
+.result {
     display: flex;
     align-items: flex-start;
     margin-bottom: 15px;
@@ -778,11 +781,32 @@ button:hover {
     background-color: #f9f9f9;
 }
 
-.book-cover, .video-thumbnail, .google-result img {
-    width: 80px;
+.book-cover, .video-thumbnail, .google-thumbnail {
+    width: 100px;
     height: auto;
-    margin-right: 15px;
     border-radius: 5px;
+    margin-right: 15px; /* Spacing between image and text */
+}
+
+.book-info, .video-info, .google-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left; /* Align text to the left */
+}
+
+.book-info h4, .video-info h4, .google-info h4 {
+    margin: 0 0 5px 0; /* Space between title and link */
+}
+
+.book-info a, .video-info a, .google-info a {
+    color: #007BFF;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.book-info a:hover, .video-info a:hover, .google-info a:hover {
+    text-decoration: underline;
 }
 
 /* ✅ Responsive Design (Auto-adjust columns) */
@@ -803,10 +827,12 @@ button:hover {
     display: none;
 }
 
-.book-info, .video-info, .google-info {
-    display: flex;
+/*.book-info, .video-info, .google-info {
+    display:inline-block;
     flex-direction: column;
-    text-align: left;
+    text-align: center;
+    padding-bottom: 20px;
+    
 }
 
 .book-info a, .video-info a, .google-info a {
@@ -819,3 +845,5 @@ button:hover {
 .book-info a:hover, .video-info a:hover, .google-info a:hover {
     text-decoration: underline;
 }
+*/
+

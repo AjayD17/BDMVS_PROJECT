@@ -927,14 +927,26 @@ button:hover {
           <p style="text-align: justify; font-size: 3vh; padding-top:3vh;">
             Empowering biological research through seamless data management and visualization.
           </p>
-          <form id="searchForm" method="GET" 
-      action="{% url 'search' 'default' %}" 
-      onsubmit="this.action = this.action.replace('default', encodeURIComponent(document.getElementById('search_word').value.trim()))">
-      onsubmit="this.action = this.action.replace('default', document.getElementById('search_word').value)">
-    <input type="text" id="search_word" name="search_word" placeholder="Enter search word" required>
-    <button type="submit" class="theme-btn btn-one" style="border-radius: 30px; font-size:2.7vh; padding-top:1.5vh; padding-bottom:1.5vh; color:white; background-color: #1b9c85;">Search</button>
-  
-</form>
+          <form id="searchForm" method="GET" action="{% url 'search' %}">
+            <input type="text" id="search_word" name="search_word" 
+       placeholder="Describe what you want to see" 
+       style="
+           padding: 12px 20px; 
+           width: 100%; 
+           max-width: 350px; 
+           border: 2px solid #1b9c85;
+           border-radius: 30px; 
+           font-size: 2.7vh; 
+           background-color: #f0fdf4; 
+           color: #1b9c85;
+       " 
+       required>
+            <button type="submit" class="theme-btn btn-one"
+                    style="border-radius: 30px; font-size:2.7vh; padding-top:1.5vh; padding-bottom:1.5vh; color:white; background-color: #1b9c85;">
+                Search
+            </button>
+        </form>
+        
 
         
         

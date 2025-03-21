@@ -11,168 +11,95 @@
     <h1>Search Results for: {{ query }}</h1>
 
     <div class="container">
-        {% if pdf_results %}
+        <!-- PDF Results Section -->
         <div id="book-results" class="panel left-panel">
             <h2>📚 Related Books</h2>
-            {% for book in pdf_results %}
-                <div class="book-result">
-                    <img src="{{ book.book_cover }}" alt="{{ book.book_name }}" class="book-cover">
-                    <div class="book-info">
-                        <h4>{{ book.book_name }}</h4>
-                        <a href="{{ book.download_link }}" target="_blank">Download</a>
-                    </div>
-                </div>
-            {% endfor %}
+            <div id="pdf-results-container">
+                
+                <p>Loading PDF results...</p>  <!-- Placeholder for async results -->
+            </div>
         </div>
-        {% endif %}
 
-        {% if google_results %}
+        <!-- Google Search Results Section -->
         <div id="google-results" class="panel left-panel">
             <h2>🌐 Google Search Results</h2>
-            {% for link in google_results %}
-                <div class="google-result">
-                    <img src="/static/default_image.png" alt="{{ link.title }}" class="google-thumbnail">
-                    <div class="google-info">
-                        <h4>{{ link.title }}</h4>
-                        <a href="{{ link.download_link }}" target="_blank">Visit</a>
-                    </div>
-                </div>
-            {% endfor %}
+            <div id="google-results-container">
+                
+                <p>Loading Google results...</p>  <!-- Placeholder for async results -->
+            </div>
         </div>
-        {% endif %}
 
-        {% if youtube_results %}
+        <!-- YouTube Results Section -->
         <div id="video-results" class="panel right-panel">
             <h2>🎬 Related Videos</h2>
-            {% for video in youtube_results %}
-                <div class="video-result">
-                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}" class="video-thumbnail">
-                    <div class="video-info">
-                        <h4>{{ video.title }}</h4>
-                        <a href="{{ video.videoUrl }}" target="_blank">Watch Now</a>
-                    </div>
-                </div>
-            {% endfor %}
+            <div id="youtube-results-container">
+                
+                <p>Loading YouTube results...</p>  <!-- Placeholder for async results -->
+            </div>
         </div>
-        {% endif %}
     </div>
-   <script>
-    
-document.getElementById("searchForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
+ <script>
+  
+   document.addEventListener("DOMContentLoaded", function () {
+    const searchWord = new URLSearchParams(window.location.search).get("search_word");
 
-    let searchWord = document.getElementById("search_word").value;
+    // Select result containers
+    const pdfContainer = document.getElementById("book-results");
+    const googleContainer = document.getElementById("google-results");
+    const youtubeContainer = document.getElementById("video-results");
 
-    let resultsDiv = document.getElementById("results");
-    let googleResultsDiv = document.getElementById("google");
-    let videoResultsDiv = document.getElementById("videos");
+    // Start all fetch requests simultaneously
+    const pdfPromise = fetch(`/ajax/search_pdf/?search_word=${encodeURIComponent(searchWord)}`);
+    const googlePromise = fetch(`/ajax/search_google/?search_word=${encodeURIComponent(searchWord)}`);
+    const youtubePromise = fetch(`/ajax/search_youtube/?search_word=${encodeURIComponent(searchWord)}`);
 
-    let bookPanel = document.getElementById("book-results");
-    let googlePanel = document.getElementById("google-results");
-    let videoPanel = document.getElementById("video-results");
-
-    let container = document.querySelector(".container");
-
-    let loadingDiv = document.getElementById("loading");
-
-    // Clear previous results
-    resultsDiv.innerHTML = '';
-    googleResultsDiv.innerHTML = '';
-    videoResultsDiv.innerHTML = '';
-
-    loadingDiv.style.display = 'block';
-
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-    try {
-        let response = await fetch('/search/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': csrfToken
-            },
-            body: new URLSearchParams({ 'search_word': searchWord })
+    // Handle PDF results
+    pdfPromise
+        .then(response => response.json())
+        .then(data => {
+            if (data.pdf_results && data.pdf_results.length > 0) {
+                pdfContainer.style.display = "block"; // Show panel if results are found
+                displayResults('pdf-results-container', data.pdf_results, 'book-cover', '/static/covers.jpg', 'book-info');
+            } else {
+                pdfContainer.style.display = "none"; // Hide panel if no results
+            }
         });
 
-        let data = await response.json();
-        loadingDiv.style.display = 'none';
+    // Handle Google results
+    googlePromise
+        .then(response => response.json())
+        .then(data => displayResults('google-results-container', data.google_results, 'google-thumbnail', '/static/images/default_image.png', 'google-info'));
 
-        // Display PDF Results
-        if (data.results && data.results.length > 0) {
-            let fragment = document.createDocumentFragment();
-            data.results.forEach(result => {
-                let div = document.createElement("div");
-                div.classList.add("book-result");
-                div.innerHTML = `
-                    <img src="${result.book_cover}" alt="${result.book_name} cover" class="book-cover" loading="lazy">
-                    <div class="book-info">
-                        <h4>${result.book_name}</h4>
-                        <a href="${result.download_link}" target="_blank">Download</a>
-                    </div>
-                `;
-                fragment.appendChild(div);
-            });
-            resultsDiv.appendChild(fragment);
-            bookPanel.classList.remove("hidden");
-        } else {
-            bookPanel.classList.add("hidden"); // Hide Books Panel if no results
+    // Handle YouTube results
+    youtubePromise
+        .then(response => response.json())
+        .then(data => displayResults('youtube-results-container', data.youtube_results, 'video-thumbnail', '/static/images/default_thumbnail.jpg', 'video-info'));
+
+    // Generic Display Function with Default Image Support
+    function displayResults(containerId, results, imageClass, defaultImage, infoClass) {
+        const container = document.getElementById(containerId);
+        if (!results || results.length === 0) {
+            container.innerHTML = "<p>No results found.</p>";
+            return;
         }
 
-        // Display Google Results
-        if (data.google_results && data.google_results.length > 0) {
-            let fragment = document.createDocumentFragment();
-            data.google_results.forEach(result => {
-                let div = document.createElement("div");
-                div.classList.add("google-result");
-                div.innerHTML = `
-                    <img src="/static/default_image.png" alt="${result.title}" class="google-thumbnail">
-                    <div class="google-info">
-                        <h4>${result.title}</h4>
-                        <a href="${result.download_link}" target="_blank">Visit</a>
-                    </div>
-                `;
-                fragment.appendChild(div);
-            });
-            googleResultsDiv.appendChild(fragment);
-            googlePanel.classList.remove("hidden");
-        } else {
-            googlePanel.classList.add("hidden"); // Hide Google Panel if no results
-        }
-
-        // Display YouTube Results
-        if (data.videos && data.videos.length > 0) {
-            data.videos.forEach(video => {
-                let div = document.createElement("div");
-                div.classList.add("video-result");
-                div.innerHTML = `
-                    <img src="/static/default_thumbnail.jpg" alt="${video.title}" class="video-thumbnail">
-                    <div class="video-info">
-                        <h4>${video.title}</h4>
-                        <a href="${video.videoUrl}" target="_blank">Watch Now</a>
-                    </div>
-                `;
-                videoResultsDiv.appendChild(div);
-            });
-            videoPanel.classList.remove("hidden");
-        } else {
-            videoPanel.classList.add("hidden"); // Hide Videos Panel if no results
-        }
-
-        // Dynamic Column Adjustment
-        if (bookPanel.classList.contains("hidden")) {
-            container.style.gridTemplateColumns = "repeat(2, 1fr)"; // Two-column layout
-        } else {
-            container.style.gridTemplateColumns = "repeat(3, 1fr)"; // Three-column layout
-        }
-
-    } catch (error) {
-        loadingDiv.style.display = 'none';
-        resultsDiv.innerHTML = "<p>An error occurred while processing the request.</p>";
-        console.error("Error loading data:", error);
+        container.innerHTML = results.map(result => `
+            <div class="result">
+                <img src="${result.book_cover ? '/static/covers/' + result.book_cover : result.thumbnail || defaultImage}" 
+                     alt="${result.book_name || result.title}" 
+                     class="${imageClass}" 
+                     loading="lazy">
+                <div class="${infoClass}">
+                    <h4>${result.book_name || result.title}</h4>
+                    <a href="${result.download_link || result.videoUrl}" target="_blank">View</a>
+                </div>
+            </div>
+        `).join('');
     }
 });
+</script>
 
 
-   </script>
+</script>    
 </body>
 </html>
