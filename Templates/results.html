@@ -40,43 +40,50 @@
     </div>
  <script>
   
-   document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
     const searchWord = new URLSearchParams(window.location.search).get("search_word");
 
-    // Select result containers
     const pdfContainer = document.getElementById("book-results");
     const googleContainer = document.getElementById("google-results");
-    const youtubeContainer = document.getElementById("video-results");
 
-    // Start all fetch requests simultaneously
-    const pdfPromise = fetch(`/ajax/search_pdf/?search_word=${encodeURIComponent(searchWord)}`);
-    const googlePromise = fetch(`/ajax/search_google/?search_word=${encodeURIComponent(searchWord)}`);
-    const youtubePromise = fetch(`/ajax/search_youtube/?search_word=${encodeURIComponent(searchWord)}`);
-
-    // Handle PDF results
-    pdfPromise
+    const googlePromise = fetch(`/ajax/search_google/?search_word=${encodeURIComponent(searchWord)}`)
         .then(response => response.json())
-        .then(data => {
-            if (data.pdf_results && data.pdf_results.length > 0) {
-                pdfContainer.style.display = "block"; // Show panel if results are found
-                displayResults('pdf-results-container', data.pdf_results, 'book-cover', '/static/covers.jpg', 'book-info');
-            } else {
-                pdfContainer.style.display = "none"; // Hide panel if no results
-            }
-        });
+        .then(data => displayResults('google-results-container', data.google_results, 'google-thumbnail', '/static/images/default_image.png', 'google-info', 'Visit'));
 
-    // Handle Google results
-    googlePromise
+    const youtubePromise = fetch(`/ajax/search_youtube/?search_word=${encodeURIComponent(searchWord)}`)
         .then(response => response.json())
-        .then(data => displayResults('google-results-container', data.google_results, 'google-thumbnail', '/static/images/default_image.png', 'google-info'));
+        .then(data => displayResults('youtube-results-container', data.youtube_results, 'video-thumbnail', '/static/images/default_thumbnail.jpg', 'video-info', 'Watch'));
 
-    // Handle YouTube results
-    youtubePromise
-        .then(response => response.json())
-        .then(data => displayResults('youtube-results-container', data.youtube_results, 'video-thumbnail', '/static/images/default_thumbnail.jpg', 'video-info'));
+    // Using EventSource for real-time streaming of book results
+    const pdfStream = new EventSource(`/ajax/search_pdf/?search_word=${encodeURIComponent(searchWord)}`);
+    pdfStream.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        appendBookResult(data); // Append results progressively
+        pdfContainer.style.display = "block";  // Show container once results arrive
+    };
 
-    // Generic Display Function with Default Image Support
-    function displayResults(containerId, results, imageClass, defaultImage, infoClass) {
+    function appendBookResult(data) {
+        const pdfResultsContainer = document.getElementById('pdf-results-container');
+        const bookDiv = document.createElement('div');
+        bookDiv.className = "result";
+        const coverPath = data.book_cover.startsWith('/static') 
+                          ? data.book_cover 
+                          : `/static/covers/${data.book_cover}`;
+
+        bookDiv.innerHTML = `
+            <img src="${coverPath}" 
+                 alt="${data.book_name}" 
+                 class="book-cover" 
+                 loading="lazy">
+            <div class="book-info">
+                <h4>${data.book_name}</h4>
+                <a href="${data.download_link}" target="_blank">Download</a>
+            </div>
+        `;
+        pdfResultsContainer.appendChild(bookDiv);
+    }
+
+    function displayResults(containerId, results, imageClass, defaultImage, infoClass, linkText) {
         const container = document.getElementById(containerId);
         if (!results || results.length === 0) {
             container.innerHTML = "<p>No results found.</p>";
@@ -91,15 +98,12 @@
                      loading="lazy">
                 <div class="${infoClass}">
                     <h4>${result.book_name || result.title}</h4>
-                    <a href="${result.download_link || result.videoUrl}" target="_blank">View</a>
+                    <a href="${result.download_link || result.videoUrl}" target="_blank">${linkText}</a>
                 </div>
             </div>
         `).join('');
     }
 });
-</script>
-
-
 </script>    
 </body>
 </html>
