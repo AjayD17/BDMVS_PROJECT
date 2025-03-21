@@ -5,16 +5,42 @@
     <meta charset="UTF-8">
     <title>Search Results for {{ query }}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
 </head>
+<style>
+    body{
+        background: linear-gradient(to right, #6dd5ed, #2193b0);
+    }
+
+    .panel {
+        padding: 0;
+        background-color: #F0F0F0;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        box-sizing: border-box;
+        height: 100%;
+        overflow-y: auto;
+        padding-top: 3vh;
+    }
+
+    @media (min-width: 768px) {
+    .container, .container-md, .container-sm {
+        max-width: 100%;
+    }
+    }
+
+</style>
 <body>
-    <h1>Search Results for: {{ query }}</h1>
+
+    {% include "navbar.html" %}
+
+    <h1 class="text-center text-white mt-4 mb-4">Search Results for: {{ query }}</h1>
 
     <div class="container">
         <!-- PDF Results Section -->
         <div id="book-results" class="panel left-panel">
-            <h2>📚 Related Books</h2>
-            <div id="pdf-results-container">
+            <h3 class="pl-2">📚 Related Books</h3>
+            <div id="pdf-results-container" class="pl-2">
                 
                 <p>Loading PDF results...</p>  <!-- Placeholder for async results -->
             </div>
@@ -22,8 +48,8 @@
 
         <!-- Google Search Results Section -->
         <div id="google-results" class="panel left-panel">
-            <h2>🌐 Google Search Results</h2>
-            <div id="google-results-container">
+            <h3 class="pl-2">🌐 Google Search Results</h3>
+            <div id="google-results-container" class="pl-2">
                 
                 <p>Loading Google results...</p>  <!-- Placeholder for async results -->
             </div>
@@ -31,8 +57,8 @@
 
         <!-- YouTube Results Section -->
         <div id="video-results" class="panel right-panel">
-            <h2>🎬 Related Videos</h2>
-            <div id="youtube-results-container">
+            <h3>🎬 Related Videos</h3>
+            <div id="youtube-results-container" class="pl-2">
                 
                 <p>Loading YouTube results...</p>  <!-- Placeholder for async results -->
             </div>
