@@ -937,7 +937,6 @@ from django.shortcuts import render, redirect
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import fitz  # PyMuPDF
 from django.conf import settings
-
 # Directory Setup
 PDF_DIR = os.path.join(settings.BASE_DIR, 'Books')
 COVERS_DIR = os.path.join(settings.BASE_DIR, 'static/covers')
@@ -1084,3 +1083,15 @@ def download(request, book_name):
     if not os.path.exists(pdf_path):
         return JsonResponse({"error": "File not found."}, status=404)
     return FileResponse(open(pdf_path, 'rb'), as_attachment=True)
+
+
+def search_results(request):
+    query = request.GET.get('search_word', '')
+    context = {'query': query}
+    return render(request, 'results.html', context)
+
+# Results view
+def search(request):
+    search_word = request.GET.get('search_word', '').strip()
+    return render(request, 'results.html', {'query': search_word})
+
