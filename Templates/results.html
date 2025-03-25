@@ -8,7 +8,38 @@
 
 </head>
 <body>
-    <h1>Search Results for: {{ query }}</h1>
+    {% include "navbar.html" %}
+    <!-- Smaller Search Container -->
+    <div class="search-container" 
+     style="
+         padding: 20px; /* Increased padding for spacious look */
+         margin-bottom: 5px; 
+         margin-top: 5px;
+         text-align: center; 
+         max-width: 700px; /* Significantly increased width */
+         width: 85%; /* Maintains responsiveness */
+         margin-left: auto;
+         margin-right: auto;
+     ">
+    
+    <form id="searchForm" method="GET" action="{% url 'search' %}">
+        <input type="text" id="search_word" name="search_word"
+               value="{{ query }}" 
+               placeholder="Enter search word"
+               style="
+                   padding: 8px;
+                   width: 80%; 
+                   border: 2px solid  #0dcaf0;
+                   border-radius: 20px;
+                   font-size: 2.2vh;
+                   background-color: #ffffff;
+                   color: #0452fd;"required>
+        <button type="submit"
+                style="padding: 8px 16px; background-color: #0c92df; color: #fff; border: none; border-radius: 20px; cursor: pointer;gap:20px;">
+            Search
+        </button>
+    </form>
+</div>
 
     <div class="container">
         <!-- PDF Results Section -->
@@ -22,7 +53,7 @@
 
         <!-- Google Search Results Section -->
         <div id="google-results" class="panel left-panel">
-            <h2>🌐 Google Search Results</h2>
+            <h2>🌐 Google Search</h2>
             <div id="google-results-container">
                 
                 <p>Loading Google results...</p>  <!-- Placeholder for async results -->
