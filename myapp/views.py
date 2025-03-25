@@ -31,9 +31,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import os, requests
 import fitz  
 from PIL import Image
-from django.http import StreamingHttpResponse
-import json
-from django.http import JsonResponse, FileResponse, StreamingHttpResponse
 
 def navbar(request):
     return render(request, "navbar.html")
@@ -929,36 +926,43 @@ def upload_files(request):
 #     return render(request, 'books.html', {'books': books, 'category': category})
 
 # Directory Setup
-import os
-import json
-import requests
-from django.http import JsonResponse, FileResponse, StreamingHttpResponse
-from django.shortcuts import render, redirect
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import fitz  # PyMuPDF
-from django.conf import settings
-# Directory Setup
 PDF_DIR = os.path.join(settings.BASE_DIR, 'Books')
 COVERS_DIR = os.path.join(settings.BASE_DIR, 'static/covers')
 os.makedirs(PDF_DIR, exist_ok=True)
 os.makedirs(COVERS_DIR, exist_ok=True)
 
 # API keys
-YOUTUBE_API_KEY = "AIzaSyBCufM0BtHWa4QZ7-SXfva8bjbe95OntuM"    
+YOUTUBE_API_KEY = "AIzaSyBCufM0BtHWa4QZ7-SXfva8bjbe95OntuM"  
 GOOGLE_API_KEY =  "AIzaSyCq3Pui_oelRt1K2CTUIhDdHJocI2ruQhI" 
 CUSTOM_SEARCH_ENGINE_ID = "c56f8f041442444b7"
 
+# Extract first page cover image
+"""def extract_first_page_image(pdf_filename):
+    try:
+        doc = fitz.open(pdf_filename)
+        first_page = doc[0]
+        pix = first_page.get_pixmap(matrix=fitz.Matrix(2, 2))
+        cover_filename = os.path.splitext(os.path.basename(pdf_filename))[0] + ".png"
+        cover_path = os.path.join(COVERS_DIR, cover_filename)
+        pix.save(cover_path)
+        return f"/static/covers/{cover_filename}"
+    except Exception:
+        return "/static/default_cover.jpg"
+"""     
 def home(request):
     return render(request, 'home.html')
 
+
+
 # Immediate redirection after form submission
 def search(request):
-    search_word = request.GET.get('search_word', '').strip()
+    search_word = request.GET.get('search_word', '').strip()  
     if not search_word:
-        return redirect('home')
-    return redirect(f'/results/?search_word={search_word}')
+        return redirect('home')  # Redirect if no search term
+    return redirect(f'/results/?search_word={search_word}')  # Correct redirection
 
-# Results view
+
+# Results view (renders the results page)
 def results(request):
     search_word = request.GET.get('search_word', '').strip()
     return render(request, 'results.html', {'query': search_word})
@@ -966,12 +970,8 @@ def results(request):
 # PDF Search (AJAX endpoint)
 def search_pdf(request):
     search_word = request.GET.get('search_word', '').strip()
-
-    def result_stream():
-        for result in search_pdfs(search_word):
-            yield f"data: {json.dumps(result)}\n\n"
-
-    return StreamingHttpResponse(result_stream(), content_type='text/event-stream')
+    pdf_results = search_pdfs(search_word)
+    return JsonResponse({"pdf_results": pdf_results})
 
 # Google Search (AJAX endpoint)
 def search_google(request):
@@ -982,58 +982,33 @@ def search_google(request):
 # YouTube Search (AJAX endpoint)
 def search_youtube(request):
     search_word = request.GET.get('search_word', '').strip()
-    youtube_results = fetch_youtube_results(search_word)
+    youtube_results = fetch_youtube_results(search_word)  # ✅ Correct function call
     return JsonResponse({"youtube_results": youtube_results})
 
 # PDF Search Logic
-def search_pdfs(search_word):  
+"""def search_pdfs(search_word):  # ✅ Accept search_word as a parameter
     pdf_files = [f for f in os.listdir(PDF_DIR) if f.endswith(".pdf")][:100]
+    results = []
 
     def search_file(file):
-        pdf_path = os.path.join(PDF_DIR, file)
-        occurrences, cover_image = search_word_in_pdf(pdf_path, search_word)
+        occurrences, cover_image = search_word_in_pdf(os.path.join(PDF_DIR, file), search_word)
         if occurrences > 0:
             return {
                 "book_name": file.replace(".pdf", ""),
-                "book_cover": cover_image if cover_image else "/static/default_cover.jpg",
+                "book_cover": cover_image,
                 "download_link": f"/download/{file}"
             }
 
-    with ThreadPoolExecutor(max_workers=10) as executor:  
+    with ThreadPoolExecutor(max_workers=5) as executor:
         futures = {executor.submit(search_file, file): file for file in pdf_files}
+
         for future in as_completed(futures):
             result = future.result()
             if result:
-                yield result
+                results.append(result)
 
-# PDF Search with Cover Extraction
-def search_word_in_pdf(pdf_path, search_word):
-    occurrences = 0
-    cover_image_path = os.path.join(COVERS_DIR, os.path.basename(pdf_path).replace('.pdf', '.png'))
-
-    if not os.path.exists(cover_image_path):
-        try:
-            with fitz.open(pdf_path) as doc:
-                first_page = doc[0]
-                pix = first_page.get_pixmap(matrix=fitz.Matrix(2, 2))
-                pix.save(cover_image_path)
-        except Exception as e:
-            print(f"Error extracting cover for {pdf_path}: {e}")
-            cover_image_path = "/static/default_cover.jpg"
-
-    try:
-        with fitz.open(pdf_path) as doc:
-            for page in doc:
-                text = page.get_text()
-                if search_word.lower() in text.lower():
-                    occurrences += text.lower().count(search_word.lower())
-                    if occurrences > 0:
-                        break
-    except Exception as e:
-        print(f"Error reading PDF {pdf_path}: {e}")
-
-    return occurrences, cover_image_path
-
+    return results
+"""
 # Google Search Logic
 def google_search(query):
     url = f"https://www.googleapis.com/customsearch/v1?q={query}&key={GOOGLE_API_KEY}&cx={CUSTOM_SEARCH_ENGINE_ID}"
@@ -1054,7 +1029,7 @@ def google_search(query):
         return []
 
 # YouTube Search Logic
-def fetch_youtube_results(query):
+def fetch_youtube_results(query):  # ✅ Changed function name to avoid conflict
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {
         "part": "snippet",
@@ -1078,20 +1053,90 @@ def fetch_youtube_results(query):
     except Exception:
         return []
 
+
+"""def search_word_in_pdf(pdf_path, search_word):
+    occurrences = 0
+    cover_image_path = None
+
+    try:
+        with fitz.open(pdf_path) as doc:
+            # Extract text and search
+            for page in doc:
+                text = page.get_text()
+                if search_word.lower() in text.lower():
+                    occurrences += text.lower().count(search_word.lower())
+                    
+                    # Extract cover image from the first page
+                    if not cover_image_path:
+                        pix = page.get_pixmap()
+                        cover_image_path = f"/static/covers/{os.path.basename(pdf_path).replace('.pdf', '.png')}"
+                        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                        img.save(os.path.join(COVERS_DIR, os.path.basename(cover_image_path)))
+
+    except Exception as e:
+        print(f"Error reading PDF {pdf_path}: {e}")
+        
+    return occurrences, cover_image_path
+
+"""
 def download(request, book_name):
     pdf_path = os.path.join(PDF_DIR, book_name)
     if not os.path.exists(pdf_path):
         return JsonResponse({"error": "File not found."}, status=404)
     return FileResponse(open(pdf_path, 'rb'), as_attachment=True)
 
+# Optimized PDF Search Logic
+def search_pdfs(search_word):  
+    pdf_files = [f for f in os.listdir(PDF_DIR) if f.endswith(".pdf")][:100]
+    results = []
 
-def search_results(request):
-    query = request.GET.get('search_word', '')
-    context = {'query': query}
-    return render(request, 'results.html', context)
+    def search_file(file):
+        pdf_path = os.path.join(PDF_DIR, file)
+        occurrences, cover_image = search_word_in_pdf(pdf_path, search_word)
+        if occurrences > 0:
+            return {
+                "book_name": file.replace(".pdf", ""),
+                "book_cover": cover_image if cover_image else "/static/default_cover.jpg",
+                "download_link": f"/download/{file}"
+            }
 
-# Results view
-def search(request):
-    search_word = request.GET.get('search_word', '').strip()
-    return render(request, 'results.html', {'query': search_word})
+    # Increased concurrency for faster search
+    with ThreadPoolExecutor(max_workers=10) as executor:  
+        futures = {executor.submit(search_file, file): file for file in pdf_files}
 
+        for future in as_completed(futures):
+            result = future.result()
+            if result:
+                results.append(result)
+
+    return results
+
+# Optimized PDF Search with Efficient Text Extraction
+def search_word_in_pdf(pdf_path, search_word):
+    occurrences = 0
+    cover_image_path = os.path.join(COVERS_DIR, os.path.basename(pdf_path).replace('.pdf', '.png'))
+
+    # Avoid re-extracting the cover if it already exists
+    if not os.path.exists(cover_image_path):
+        try:
+            with fitz.open(pdf_path) as doc:
+                first_page = doc[0]
+                pix = first_page.get_pixmap(matrix=fitz.Matrix(2, 2))
+                pix.save(cover_image_path)
+        except Exception as e:
+            print(f"Error extracting cover for {pdf_path}: {e}")
+            cover_image_path = "/static/default_cover.jpg"
+
+    # Efficient text search with early stop
+    try:
+        with fitz.open(pdf_path) as doc:
+            for page in doc:
+                text = page.get_text()
+                if search_word.lower() in text.lower():
+                    occurrences += text.lower().count(search_word.lower())
+                    if occurrences > 0:
+                        break  # Early exit once matches are found
+    except Exception as e:
+        print(f"Error reading PDF {pdf_path}: {e}")
+        
+    return occurrences, cover_image_path

@@ -64,12 +64,10 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('search/', views.search, name='search'),
     path('download/<str:book_name>/', views.download, name='download'),
-    path('results/', views.search_results, name='search'),
-    path('results/', views.search_results, name='search'),
+    path('results/', views.results, name='results'),
     path('ajax/search_pdf/', views.search_pdf, name='search_pdf'),
     path('ajax/search_google/', views.search_google, name='search_google'),
     path('ajax/search_youtube/', views.search_youtube, name='search_youtube'),
-   
 ]
 
 if settings.DEBUG:
