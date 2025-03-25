@@ -918,20 +918,24 @@ button:hover {
         <li><a href="{% url 'signup' %}" style="text-decoration: none;">Login</a></li>
       </ul>
       <div id="menu__btn" class="fas fa-bars"></div>
-    </nav>
+    </nav>  Why login profile photo is not showable plse if once i login then i want to showed the login profile pictures give me the related codes...?
     
     <section id="Home">
       <div class="home">
         <div class="home__first pt-4 pb-4" style="margin-top:17vh;">
           <h5 class="pb-2"><b>BIOLOGICAL DEVELOPMENT MANAGEMENT & VISUALIZATION SYSTEM</b></h5>
-          <p style="text-align: justify; font-size: 3vh; padding-top:3vh;">
+          <p style="text-align: justify; font-size: 3vh; margin-top:2.5vh;">
             Empowering biological research through seamless data management and visualization.
           </p>
           <form id="searchForm" method="GET" action="{% url 'search' %}">
             <input type="text" id="search_word" name="search_word" 
        placeholder="Describe what you want to see" 
        style="
-           padding: 12px 20px; 
+           margin-top:2.5vh;
+           padding-top: 1.5vh;
+           padding-bottom: 1.5vh; 
+           padding-left: 3vh;
+           margin-right:1vh;
            width: 100%; 
            max-width: 350px; 
            border: 2px solid #1b9c85;
@@ -942,7 +946,7 @@ button:hover {
        " 
        required>
             <button type="submit" class="theme-btn btn-one"
-                    style="border-radius: 30px; font-size:2.7vh; padding-top:1.5vh; padding-bottom:1.5vh; color:white; background-color: #1b9c85;">
+                    style="border-radius: 30px; font-size:2.7vh; padding-top:1.5vh; padding-bottom:1.5vh; color:white; background-color: #1b9c85; margin-top:2.5vh;">
                 Search
             </button>
         </form>
