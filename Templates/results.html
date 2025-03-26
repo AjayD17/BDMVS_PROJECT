@@ -9,6 +9,8 @@
 </head>
 <body>
 
+    {% include "navbar.html" %}
+
     <!-- Smaller Search Container -->
     <div class="search-container" 
      style="
@@ -70,76 +72,108 @@
             </div>
         </div>
     </div>
-
-    <script>
+ <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const searchWord = new URLSearchParams(window.location.search).get("search_word") || "{{ query }}";
+    const searchWord = new URLSearchParams(window.location.search).get("search_word") || "{{ query }}";
 
-        const pdfContainer = document.getElementById("book-results");
-        const googleContainer = document.getElementById("google-results");
+    const pdfContainer = document.getElementById("book-results");
+    const googleContainer = document.getElementById("google-results");
+    const resultsContainer = document.querySelector(".container");
 
-        const googlePromise = fetch(`/ajax/search_google/?search_word=${encodeURIComponent(searchWord)}`)
-            .then(response => response.json())
-            .then(data => displayResults('google-results-container', data.google_results, 'google-thumbnail', '/static/images/default_image.png', 'google-info', 'Visit'));
+    const pdfResultsContainer = document.getElementById('pdf-results-container');
 
-        const youtubePromise = fetch(`/ajax/search_youtube/?search_word=${encodeURIComponent(searchWord)}`)
-            .then(response => response.json())
-            .then(data => displayResults('youtube-results-container', data.youtube_results, 'video-thumbnail', '/static/images/default_thumbnail.jpg', 'video-info', 'Watch'));
+    let bookFound = false;  // Track if book results are found
+    let pdfTimeout;         // Timeout to quickly detect no book results
 
-        const pdfStream = new EventSource(`/ajax/search_pdf/?search_word=${encodeURIComponent(searchWord)}`);
-        pdfStream.onmessage = function (event) {
-            const data = JSON.parse(event.data);
-            appendBookResult(data);
-            pdfContainer.style.display = "block"; 
-        };
+    const googlePromise = fetch(`/ajax/search_google/?search_word=${encodeURIComponent(searchWord)}`)
+        .then(response => response.json())
+        .then(data => displayResults('google-results-container', data.google_results, 'google-thumbnail', '/static/images/default_image.png', 'google-info', 'Visit'))
+        .catch(() => displayError('google-results-container'));
 
-        function appendBookResult(data) {
-            const pdfResultsContainer = document.getElementById('pdf-results-container');
+    const youtubePromise = fetch(`/ajax/search_youtube/?search_word=${encodeURIComponent(searchWord)}`)
+        .then(response => response.json())
+        .then(data => displayResults('youtube-results-container', data.youtube_results, 'video-thumbnail', '/static/images/default_thumbnail.jpg', 'video-info', 'Watch'))
+        .catch(() => displayError('youtube-results-container'));
 
-            if (pdfResultsContainer.querySelector('p')) {
-                pdfResultsContainer.innerHTML = ''; // Clear placeholder
-            }
+    const pdfStream = new EventSource(`/ajax/search_pdf/?search_word=${encodeURIComponent(searchWord)}`);
 
-            const bookDiv = document.createElement('div');
-            bookDiv.className = "result";
-            const coverPath = data.book_cover.startsWith('/static') 
-                              ? data.book_cover 
-                              : `/static/covers/${data.book_cover}`;
+    // Early Timeout for Faster Detection (3 seconds)
+    pdfTimeout = setTimeout(() => {
+        if (!bookFound) {
+            pdfStream.close(); // Stop listening if no books are found quickly
+            pdfContainer.classList.add('hidden');  // Hide 'Related Books'
+            resultsContainer.classList.add('no-books');  // Switch to two-column layout
+        }
+    }, 3000);
 
-            bookDiv.innerHTML = `
-                <img src="${coverPath}" 
-                     alt="${data.book_name}" 
-                     class="book-cover" 
+    pdfStream.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+
+        if (data.no_books_found) {
+            clearTimeout(pdfTimeout);  // Clear timeout if 'no_books_found' signal is received
+            pdfStream.close();  // Stop listening for more data
+            pdfContainer.classList.add('hidden');  // Hide 'Related Books'
+            resultsContainer.classList.add('no-books');  // Switch to two-column layout
+            return;
+        }
+
+        appendBookResult(data);
+        pdfContainer.style.display = "block"; 
+        bookFound = true;  // Mark as found
+        clearTimeout(pdfTimeout); // Clear the timeout when books are found
+    };
+
+    function appendBookResult(data) {
+        if (pdfResultsContainer.querySelector('p')) {
+            pdfResultsContainer.innerHTML = ''; // Clear placeholder
+        }
+
+        const bookDiv = document.createElement('div');
+        bookDiv.className = "result";
+        const coverPath = data.book_cover.startsWith('/static') 
+                          ? data.book_cover 
+                          : `/static/covers/${data.book_cover}`;
+
+        bookDiv.innerHTML = `
+            <img src="${coverPath}" 
+                 alt="${data.book_name}" 
+                 class="book-cover" 
+                 loading="lazy">
+            <div class="book-info">
+                <h4>${data.book_name}</h4>
+                <a href="${data.download_link}" target="_blank">Download</a>
+            </div>
+        `;
+        pdfResultsContainer.appendChild(bookDiv);
+    }
+
+    function displayResults(containerId, results, imageClass, defaultImage, infoClass, linkText) {
+        const container = document.getElementById(containerId);
+        if (!results || results.length === 0) {
+            container.innerHTML = "<p>No results found.</p>";
+            return;
+        }
+
+        container.innerHTML = results.map(result => `
+            <div class="result">
+                <img src="${result.book_cover ? '/static/covers/' + result.book_cover : result.thumbnail || defaultImage}" 
+                     alt="${result.book_name || result.title}" 
+                     class="${imageClass}" 
                      loading="lazy">
-                <div class="book-info">
-                    <h4>${data.book_name}</h4>
-                    <a href="${data.download_link}" target="_blank">Download</a>
+                <div class="${infoClass}">
+                    <h4>${result.book_name || result.title}</h4>
+                    <a href="${result.download_link || result.videoUrl}" target="_blank">${linkText}</a>
                 </div>
-            `;
-            pdfResultsContainer.appendChild(bookDiv);
-        }
+            </div>
+        `).join('');
+    }
 
-        function displayResults(containerId, results, imageClass, defaultImage, infoClass, linkText) {
-            const container = document.getElementById(containerId);
-            if (!results || results.length === 0) {
-                container.innerHTML = "<p>No results found.</p>";
-                return;
-            }
+    function displayError(containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "<p>Failed to load results. Please try again later.</p>";
+    }
+});
 
-            container.innerHTML = results.map(result => `
-                <div class="result">
-                    <img src="${result.book_cover ? '/static/covers/' + result.book_cover : result.thumbnail || defaultImage}" 
-                         alt="${result.book_name || result.title}" 
-                         class="${imageClass}" 
-                         loading="lazy">
-                    <div class="${infoClass}">
-                        <h4>${result.book_name || result.title}</h4>
-                        <a href="${result.download_link || result.videoUrl}" target="_blank">${linkText}</a>
-                    </div>
-                </div>
-            `).join('');
-        }
-    });
-    </script>
+</script>    
 </body>
 </html>
