@@ -711,9 +711,7 @@
     border-radius: 16px;
     width: 350px;
 }
-/* search style */
-
-/* Book,google,youtube styles */
+/*search*/
 body {
     font-family: Arial, sans-serif;
     text-align: center;
@@ -759,13 +757,13 @@ button:hover {
 }
 
 .panel {
-   
     background-color: white;
-    border-radius: 12px;
+    border-radius: 12px ;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
     height: 450px;
-    overflow-y: auto;
+    overflow-y: auto; /* Vertical scroll only */
+    overflow-x: hidden; /* Horizontal scroll removed */
     position: relative;
 }
 
@@ -777,9 +775,6 @@ button:hover {
     margin-top: 0;
     border-bottom: 2px solid #2b73f9;
     z-index: 2;
-}
-h2{
-    top:0px;
 }
 
 .panel::before {

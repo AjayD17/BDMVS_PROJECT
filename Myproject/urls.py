@@ -68,6 +68,7 @@ urlpatterns = [
     path('ajax/search_pdf/', views.search_pdf, name='search_pdf'),
     path('ajax/search_google/', views.search_google, name='search_google'),
     path('ajax/search_youtube/', views.search_youtube, name='search_youtube'),
+    
 ]
 
 if settings.DEBUG:
