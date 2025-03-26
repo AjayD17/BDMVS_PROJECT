@@ -72,7 +72,7 @@
             </div>
         </div>
     </div>
- <script>
+    <script>
     document.addEventListener("DOMContentLoaded", function () {
     const searchWord = new URLSearchParams(window.location.search).get("search_word") || "{{ query }}";
 
@@ -82,8 +82,8 @@
 
     const pdfResultsContainer = document.getElementById('pdf-results-container');
 
-    let bookFound = false;  // Track if book results are found
-    let pdfTimeout;         // Timeout to quickly detect no book results
+    let bookFound = false;
+    let pdfTimeout;
 
     const googlePromise = fetch(`/ajax/search_google/?search_word=${encodeURIComponent(searchWord)}`)
         .then(response => response.json())
@@ -97,35 +97,38 @@
 
     const pdfStream = new EventSource(`/ajax/search_pdf/?search_word=${encodeURIComponent(searchWord)}`);
 
-    // Early Timeout for Faster Detection (3 seconds)
     pdfTimeout = setTimeout(() => {
         if (!bookFound) {
-            pdfStream.close(); // Stop listening if no books are found quickly
-            pdfContainer.classList.add('hidden');  // Hide 'Related Books'
-            resultsContainer.classList.add('no-books');  // Switch to two-column layout
+            console.warn("PDF Timeout: No book found within the time limit.");
+            pdfStream.close();
+            pdfContainer.classList.add('hidden');
+            resultsContainer.classList.add('no-books');
         }
-    }, 3000);
+    }, 5000); // Increased timeout to 5 seconds for improved performance
 
     pdfStream.onmessage = function (event) {
+        console.log("PDF Data Received:", event.data);  // Debugging log
         const data = JSON.parse(event.data);
 
         if (data.no_books_found) {
-            clearTimeout(pdfTimeout);  // Clear timeout if 'no_books_found' signal is received
-            pdfStream.close();  // Stop listening for more data
-            pdfContainer.classList.add('hidden');  // Hide 'Related Books'
-            resultsContainer.classList.add('no-books');  // Switch to two-column layout
+            console.warn("No books found.");
+            clearTimeout(pdfTimeout);
+            pdfStream.close();
+            pdfContainer.classList.add('hidden');
+            resultsContainer.classList.add('no-books');
             return;
         }
 
+        console.log("Book Found:", data.book_name);
         appendBookResult(data);
-        pdfContainer.style.display = "block"; 
-        bookFound = true;  // Mark as found
-        clearTimeout(pdfTimeout); // Clear the timeout when books are found
+        pdfContainer.style.display = "block";
+        bookFound = true;
+        clearTimeout(pdfTimeout);
     };
 
     function appendBookResult(data) {
         if (pdfResultsContainer.querySelector('p')) {
-            pdfResultsContainer.innerHTML = ''; // Clear placeholder
+            pdfResultsContainer.innerHTML = '';
         }
 
         const bookDiv = document.createElement('div');
@@ -139,8 +142,8 @@
                  alt="${data.book_name}" 
                  class="book-cover" 
                  loading="lazy">
-            <div class="book-info">
-                <h4>${data.book_name}</h4>
+            <div class="book-info" title="${data.book_name}">
+                <h4 class="ellipsis">${truncateText(data.book_name, 10)}</h4>
                 <a href="${data.download_link}" target="_blank">Download</a>
             </div>
         `;
@@ -160,8 +163,8 @@
                      alt="${result.book_name || result.title}" 
                      class="${imageClass}" 
                      loading="lazy">
-                <div class="${infoClass}">
-                    <h4>${result.book_name || result.title}</h4>
+                <div class="${infoClass}" title="${result.book_name || result.title}">
+                    <h4 class="ellipsis">${truncateText(result.book_name || result.title, 10)}</h4>
                     <a href="${result.download_link || result.videoUrl}" target="_blank">${linkText}</a>
                 </div>
             </div>
@@ -172,6 +175,23 @@
         const container = document.getElementById(containerId);
         container.innerHTML = "<p>Failed to load results. Please try again later.</p>";
     }
+
+    function truncateText(text, wordLimit = 10) {
+        const words = text.split(' ');
+        return words.length > wordLimit 
+            ? words.slice(0, wordLimit).join(' ') + '...' 
+            : text;
+    }
+
+    const observer = new MutationObserver(() => {
+        document.querySelectorAll('.book-info h4, .google-info h4, .video-info h4')
+            .forEach(element => {
+                const fullText = element.getAttribute('title');
+                element.textContent = truncateText(fullText, 10);
+            });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
 });
 
 </script>    

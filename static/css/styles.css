@@ -711,7 +711,7 @@
     border-radius: 16px;
     width: 350px;
 }
-/*search*/
+
 /* Search Page Styling */
 body {
     font-family: Arial, sans-serif;
@@ -774,6 +774,7 @@ button:hover {
     overflow-y: auto;
     overflow-x: hidden;
     position: relative;
+    text-align: center;
 }
 
 .panel h2 {
@@ -868,4 +869,41 @@ button:hover {
     display: grid;
     grid-template-columns: 1fr 1fr; /* Two equal columns */
     gap: 20px;
+}
+
+.ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px; /* Adjust width as needed */
+    display: inline-block;
+}
+
+.book-info, .google-info, .video-info {
+    position: relative;
+}
+
+.book-info[title]:hover::after,
+.google-info[title]:hover::after,
+.video-info[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    white-space: normal; /* Allows multi-line text */
+    max-width: 300px;  /* Expanded for longer content */
+    overflow: visible;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+
+    /* Positioning Improvements */
+    top: 100%;      /* Below the truncated text */
+    left: 50%;      /* Center the tooltip */
+    transform: translateX(-50%); /* Ensures tooltip centers properly */
+    z-index: 999;   /* Ensures tooltip stays on top */
+
+    /* Prevent Tooltip Cutoff */
+    word-wrap: break-word;
+    white-space: normal;
 }
