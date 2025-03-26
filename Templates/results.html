@@ -5,33 +5,10 @@
     <meta charset="UTF-8">
     <title>Search Results for {{ query }}</title>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+
 </head>
-<style>
-    body{
-        background: linear-gradient(to right, #6dd5ed, #2193b0);
-    }
-
-    .panel {
-        padding: 0;
-        background-color: #F0F0F0;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        box-sizing: border-box;
-        height: 100%;
-        overflow-y: auto;
-        padding-top: 3vh;
-    }
-
-    @media (min-width: 768px) {
-    .container, .container-md, .container-sm {
-        max-width: 100%;
-    }
-    }
-
-</style>
 <body>
-    {% include "navbar.html" %}
+
     <!-- Smaller Search Container -->
     <div class="search-container" 
      style="
@@ -40,7 +17,7 @@
          margin-top: 5px;
          text-align: center; 
          max-width: 700px; /* Significantly increased width */
-         width: 85%; /* Maintains responsiveness */
+         width: 75%; /* Maintains responsiveness */
          margin-left: auto;
          margin-right: auto;
      ">
@@ -58,21 +35,18 @@
                    background-color: #ffffff;
                    color: #0452fd;"required>
         <button type="submit"
-                style="padding: 8px 16px; background-color: #0c92df; color: #fff; border: none; border-radius: 20px; cursor: pointer;gap:20px;">
+                style="padding: 8px 16px; color: #fff; border: none; border-radius: 20px; cursor: pointer;gap:20px;
+                background-color:rgb(240, 59, 59)">
             Search
         </button>
     </form>
 </div>
 
-    {% include "navbar.html" %}
-
-    <h1 class="text-center text-white mt-4 mb-4">Search Results for: {{ query }}</h1>
-
     <div class="container">
         <!-- PDF Results Section -->
         <div id="book-results" class="panel left-panel">
-            <h3 class="pl-2">📚 Related Books</h3>
-            <div id="pdf-results-container" class="pl-2">
+            <h2>📚 Related Books</h2>
+            <div id="pdf-results-container">
                 
                 <p>Loading PDF results...</p>  <!-- Placeholder for async results -->
             </div>
@@ -82,8 +56,6 @@
         <div id="google-results" class="panel left-panel">
             <h2>🌐 Google Search</h2>
             <div id="google-results-container">
-            <h3 class="pl-2">🌐 Google Search Results</h3>
-            <div id="google-results-container" class="pl-2">
                 
                 <p>Loading Google results...</p>  <!-- Placeholder for async results -->
             </div>
@@ -91,75 +63,83 @@
 
         <!-- YouTube Results Section -->
         <div id="video-results" class="panel right-panel">
-            <h3>🎬 Related Videos</h3>
-            <div id="youtube-results-container" class="pl-2">
+            <h2>🎬 Related Videos</h2>
+            <div id="youtube-results-container">
                 
                 <p>Loading YouTube results...</p>  <!-- Placeholder for async results -->
             </div>
         </div>
     </div>
- <script>
-  
-   document.addEventListener("DOMContentLoaded", function () {
-    const searchWord = new URLSearchParams(window.location.search).get("search_word");
 
-    // Select result containers
-    const pdfContainer = document.getElementById("book-results");
-    const googleContainer = document.getElementById("google-results");
-    const youtubeContainer = document.getElementById("video-results");
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchWord = new URLSearchParams(window.location.search).get("search_word") || "{{ query }}";
 
-    // Start all fetch requests simultaneously
-    const pdfPromise = fetch(`/ajax/search_pdf/?search_word=${encodeURIComponent(searchWord)}`);
-    const googlePromise = fetch(`/ajax/search_google/?search_word=${encodeURIComponent(searchWord)}`);
-    const youtubePromise = fetch(`/ajax/search_youtube/?search_word=${encodeURIComponent(searchWord)}`);
+        const pdfContainer = document.getElementById("book-results");
+        const googleContainer = document.getElementById("google-results");
 
-    // Handle PDF results
-    pdfPromise
-        .then(response => response.json())
-        .then(data => {
-            if (data.pdf_results && data.pdf_results.length > 0) {
-                pdfContainer.style.display = "block"; // Show panel if results are found
-                displayResults('pdf-results-container', data.pdf_results, 'book-cover', '/static/covers.jpg', 'book-info');
-            } else {
-                pdfContainer.style.display = "none"; // Hide panel if no results
+        const googlePromise = fetch(`/ajax/search_google/?search_word=${encodeURIComponent(searchWord)}`)
+            .then(response => response.json())
+            .then(data => displayResults('google-results-container', data.google_results, 'google-thumbnail', '/static/images/default_image.png', 'google-info', 'Visit'));
+
+        const youtubePromise = fetch(`/ajax/search_youtube/?search_word=${encodeURIComponent(searchWord)}`)
+            .then(response => response.json())
+            .then(data => displayResults('youtube-results-container', data.youtube_results, 'video-thumbnail', '/static/images/default_thumbnail.jpg', 'video-info', 'Watch'));
+
+        const pdfStream = new EventSource(`/ajax/search_pdf/?search_word=${encodeURIComponent(searchWord)}`);
+        pdfStream.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            appendBookResult(data);
+            pdfContainer.style.display = "block"; 
+        };
+
+        function appendBookResult(data) {
+            const pdfResultsContainer = document.getElementById('pdf-results-container');
+
+            if (pdfResultsContainer.querySelector('p')) {
+                pdfResultsContainer.innerHTML = ''; // Clear placeholder
             }
-        });
 
-    // Handle Google results
-    googlePromise
-        .then(response => response.json())
-        .then(data => displayResults('google-results-container', data.google_results, 'google-thumbnail', '/static/images/default_image.png', 'google-info'));
+            const bookDiv = document.createElement('div');
+            bookDiv.className = "result";
+            const coverPath = data.book_cover.startsWith('/static') 
+                              ? data.book_cover 
+                              : `/static/covers/${data.book_cover}`;
 
-    // Handle YouTube results
-    youtubePromise
-        .then(response => response.json())
-        .then(data => displayResults('youtube-results-container', data.youtube_results, 'video-thumbnail', '/static/images/default_thumbnail.jpg', 'video-info'));
-
-    // Generic Display Function with Default Image Support
-    function displayResults(containerId, results, imageClass, defaultImage, infoClass) {
-        const container = document.getElementById(containerId);
-        if (!results || results.length === 0) {
-            container.innerHTML = "<p>No results found.</p>";
-            return;
+            bookDiv.innerHTML = `
+                <img src="${coverPath}" 
+                     alt="${data.book_name}" 
+                     class="book-cover" 
+                     loading="lazy">
+                <div class="book-info">
+                    <h4>${data.book_name}</h4>
+                    <a href="${data.download_link}" target="_blank">Download</a>
+                </div>
+            `;
+            pdfResultsContainer.appendChild(bookDiv);
         }
 
-        container.innerHTML = results.map(result => `
-            <div class="result">
-                <img src="${result.book_cover ? '/static/covers/' + result.book_cover : result.thumbnail || defaultImage}" 
-                     alt="${result.book_name || result.title}" 
-                     class="${imageClass}" 
-                     loading="lazy">
-                <div class="${infoClass}">
-                    <h4>${result.book_name || result.title}</h4>
-                    <a href="${result.download_link || result.videoUrl}" target="_blank">View</a>
+        function displayResults(containerId, results, imageClass, defaultImage, infoClass, linkText) {
+            const container = document.getElementById(containerId);
+            if (!results || results.length === 0) {
+                container.innerHTML = "<p>No results found.</p>";
+                return;
+            }
+
+            container.innerHTML = results.map(result => `
+                <div class="result">
+                    <img src="${result.book_cover ? '/static/covers/' + result.book_cover : result.thumbnail || defaultImage}" 
+                         alt="${result.book_name || result.title}" 
+                         class="${imageClass}" 
+                         loading="lazy">
+                    <div class="${infoClass}">
+                        <h4>${result.book_name || result.title}</h4>
+                        <a href="${result.download_link || result.videoUrl}" target="_blank">${linkText}</a>
+                    </div>
                 </div>
-            </div>
-        `).join('');
-    }
-});
-</script>
-
-
-</script>    
+            `).join('');
+        }
+    });
+    </script>
 </body>
 </html>
