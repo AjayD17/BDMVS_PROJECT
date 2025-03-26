@@ -712,6 +712,7 @@
     width: 350px;
 }
 /*search*/
+/* Search Page Styling */
 body {
     font-family: Arial, sans-serif;
     text-align: center;
@@ -756,14 +757,22 @@ button:hover {
     margin: auto;
 }
 
+#book-results.hidden {
+    display: none;
+}
+
+.no-books .container {
+    grid-template-columns: 1fr 1fr; /* Split screen into 2 columns */
+}
+
 .panel {
     background-color: white;
-    border-radius: 12px ;
+    border-radius: 12px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
     height: 450px;
-    overflow-y: auto; /* Vertical scroll only */
-    overflow-x: hidden; /* Horizontal scroll removed */
+    overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
 }
 
@@ -851,5 +860,6 @@ button:hover {
 }
 
 .hidden {
+ 
     display: none;
 }

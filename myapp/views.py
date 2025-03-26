@@ -926,7 +926,6 @@ def upload_files(request):
 #                 book.save(update_fields=['image'])
 
 #     return render(request, 'books.html', {'books': books, 'category': category})
-
 # Directory Setup
 PDF_DIR = os.path.join(settings.BASE_DIR, 'Books')
 COVERS_DIR = os.path.join(settings.BASE_DIR, 'static/covers')
@@ -934,8 +933,8 @@ os.makedirs(PDF_DIR, exist_ok=True)
 os.makedirs(COVERS_DIR, exist_ok=True)
 
 # API keys
-YOUTUBE_API_KEY = "AIzaSyBCufM0BtHWa4QZ7-SXfva8bjbe95OntuM"    
-GOOGLE_API_KEY =  "AIzaSyCq3Pui_oelRt1K2CTUIhDdHJocI2ruQhI" 
+YOUTUBE_API_KEY = "AIzaSyCCLzb24E4fuJLwdeq94Zu9JPSkiozifso"    
+GOOGLE_API_KEY =  "AIzaSyAlk5VLBoiCD3TqxLS9HtMlyQZMgueX2NE" 
 CUSTOM_SEARCH_ENGINE_ID = "c56f8f041442444b7"
 
 def home(request):
@@ -1084,3 +1083,4 @@ def search_results(request):
 def search(request):
     search_word = request.GET.get('search_word', '').strip()
     return render(request, 'results.html', {'query': search_word})
+
