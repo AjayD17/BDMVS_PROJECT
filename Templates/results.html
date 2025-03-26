@@ -8,8 +8,10 @@
     <title>Search Results</title>
 </head>
 <body>
+
     {% include "navbar.html" %}
-    <!-- Search Container -->
+
+    <!-- Smaller Search Container -->
     <div class="search-container" 
      style="
          padding: 20px; 
@@ -69,76 +71,128 @@
             </div>
         </div>
     </div>
-
     <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const searchWord = new URLSearchParams(window.location.search).get("search_word") || "{{ query }}";
+    const searchWord = new URLSearchParams(window.location.search).get("search_word") || "{{ query }}";
 
-        const pdfContainer = document.getElementById("book-results");
-        const googleContainer = document.getElementById("google-results");
+    const pdfContainer = document.getElementById("book-results");
+    const googleContainer = document.getElementById("google-results");
+    const resultsContainer = document.querySelector(".container");
 
-        const googlePromise = fetch(`/ajax/search_google/?search_word=${encodeURIComponent(searchWord)}`)
-            .then(response => response.json())
-            .then(data => displayResults('google-results-container', data.google_results, 'google-thumbnail', '/static/images/default_image.png', 'google-info', 'Visit'));
+    const pdfResultsContainer = document.getElementById('pdf-results-container');
 
-        const youtubePromise = fetch(`/ajax/search_youtube/?search_word=${encodeURIComponent(searchWord)}`)
-            .then(response => response.json())
-            .then(data => displayResults('youtube-results-container', data.youtube_results, 'video-thumbnail', '/static/images/default_thumbnail.jpg', 'video-info', 'Watch'));
+    let bookFound = false;
+    let pdfTimeout;
 
-        const pdfStream = new EventSource(`/ajax/search_pdf/?search_word=${encodeURIComponent(searchWord)}`);
-        pdfStream.onmessage = function (event) {
-            const data = JSON.parse(event.data);
-            appendBookResult(data);
-            pdfContainer.style.display = "block"; 
-        };
+    const googlePromise = fetch(`/ajax/search_google/?search_word=${encodeURIComponent(searchWord)}`)
+        .then(response => response.json())
+        .then(data => displayResults('google-results-container', data.google_results, 'google-thumbnail', '/static/images/default_image.png', 'google-info', 'Visit'))
+        .catch(() => displayError('google-results-container'));
 
-        function appendBookResult(data) {
-            const pdfResultsContainer = document.getElementById('pdf-results-container');
+    const youtubePromise = fetch(`/ajax/search_youtube/?search_word=${encodeURIComponent(searchWord)}`)
+        .then(response => response.json())
+        .then(data => displayResults('youtube-results-container', data.youtube_results, 'video-thumbnail', '/static/images/default_thumbnail.jpg', 'video-info', 'Watch'))
+        .catch(() => displayError('youtube-results-container'));
 
-            if (pdfResultsContainer.querySelector('p')) {
-                pdfResultsContainer.innerHTML = ''; // Clear placeholder
-            }
+    const pdfStream = new EventSource(`/ajax/search_pdf/?search_word=${encodeURIComponent(searchWord)}`);
 
-            const bookDiv = document.createElement('div');
-            bookDiv.className = "result";
-            const coverPath = data.book_cover.startsWith('/static') 
-                              ? data.book_cover 
-                              : `/static/covers/${data.book_cover}`;
+    pdfTimeout = setTimeout(() => {
+        if (!bookFound) {
+            console.warn("PDF Timeout: No book found within the time limit.");
+            pdfStream.close();
+            pdfContainer.classList.add('hidden');
+            resultsContainer.classList.add('no-books');
+        }
+    }, 5000); // Increased timeout to 5 seconds for improved performance
 
-            bookDiv.innerHTML = `
-                <img src="${coverPath}" 
-                     alt="${data.book_name}" 
-                     class="book-cover" 
+    pdfStream.onmessage = function (event) {
+        console.log("PDF Data Received:", event.data);  // Debugging log
+        const data = JSON.parse(event.data);
+
+        if (data.no_books_found) {
+            console.warn("No books found.");
+            clearTimeout(pdfTimeout);
+            pdfStream.close();
+            pdfContainer.classList.add('hidden');
+            resultsContainer.classList.add('no-books');
+            return;
+        }
+
+        console.log("Book Found:", data.book_name);
+        appendBookResult(data);
+        pdfContainer.style.display = "block";
+        bookFound = true;
+        clearTimeout(pdfTimeout);
+    };
+
+    function appendBookResult(data) {
+        if (pdfResultsContainer.querySelector('p')) {
+            pdfResultsContainer.innerHTML = '';
+        }
+
+        const bookDiv = document.createElement('div');
+        bookDiv.className = "result";
+        const coverPath = data.book_cover.startsWith('/static') 
+                          ? data.book_cover 
+                          : `/static/covers/${data.book_cover}`;
+
+        bookDiv.innerHTML = `
+            <img src="${coverPath}" 
+                 alt="${data.book_name}" 
+                 class="book-cover" 
+                 loading="lazy">
+            <div class="book-info" title="${data.book_name}">
+                <h4 class="ellipsis">${truncateText(data.book_name, 10)}</h4>
+                <a href="${data.download_link}" target="_blank">Download</a>
+            </div>
+        `;
+        pdfResultsContainer.appendChild(bookDiv);
+    }
+
+    function displayResults(containerId, results, imageClass, defaultImage, infoClass, linkText) {
+        const container = document.getElementById(containerId);
+        if (!results || results.length === 0) {
+            container.innerHTML = "<p>No results found.</p>";
+            return;
+        }
+
+        container.innerHTML = results.map(result => `
+            <div class="result">
+                <img src="${result.book_cover ? '/static/covers/' + result.book_cover : result.thumbnail || defaultImage}" 
+                     alt="${result.book_name || result.title}" 
+                     class="${imageClass}" 
                      loading="lazy">
-                <div class="book-info">
-                    <h4>${data.book_name}</h4>
-                    <a href="${data.download_link}" target="_blank">Download</a>
+                <div class="${infoClass}" title="${result.book_name || result.title}">
+                    <h4 class="ellipsis">${truncateText(result.book_name || result.title, 10)}</h4>
+                    <a href="${result.download_link || result.videoUrl}" target="_blank">${linkText}</a>
                 </div>
-            `;
-            pdfResultsContainer.appendChild(bookDiv);
-        }
+            </div>
+        `).join('');
+    }
 
-        function displayResults(containerId, results, imageClass, defaultImage, infoClass, linkText) {
-            const container = document.getElementById(containerId);
-            if (!results || results.length === 0) {
-                container.innerHTML = "<p>No results found.</p>";
-                return;
-            }
+    function displayError(containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "<p>Failed to load results. Please try again later.</p>";
+    }
 
-            container.innerHTML = results.map(result => `
-                <div class="result">
-                    <img src="${result.book_cover ? '/static/covers/' + result.book_cover : result.thumbnail || defaultImage}" 
-                         alt="${result.book_name || result.title}" 
-                         class="${imageClass}" 
-                         loading="lazy">
-                    <div class="${infoClass}">
-                        <h4>${result.book_name || result.title}</h4>
-                        <a href="${result.download_link || result.videoUrl}" target="_blank">${linkText}</a>
-                    </div>
-                </div>
-            `).join('');
-        }
+    function truncateText(text, wordLimit = 10) {
+        const words = text.split(' ');
+        return words.length > wordLimit 
+            ? words.slice(0, wordLimit).join(' ') + '...' 
+            : text;
+    }
+
+    const observer = new MutationObserver(() => {
+        document.querySelectorAll('.book-info h4, .google-info h4, .video-info h4')
+            .forEach(element => {
+                const fullText = element.getAttribute('title');
+                element.textContent = truncateText(fullText, 10);
+            });
     });
-    </script>
+
+    observer.observe(document.body, { childList: true, subtree: true });
+});
+
+</script>    
 </body>
 </html>

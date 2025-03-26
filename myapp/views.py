@@ -934,10 +934,11 @@ os.makedirs(PDF_DIR, exist_ok=True)
 os.makedirs(COVERS_DIR, exist_ok=True)
 
 # API keys
-YOUTUBE_API_KEY = "AIzaSyBCufM0BtHWa4QZ7-SXfva8bjbe95OntuM"    
-GOOGLE_API_KEY =  "AIzaSyCq3Pui_oelRt1K2CTUIhDdHJocI2ruQhI" 
+YOUTUBE_API_KEY = "AIzaSyAlk5VLBoiCD3TqxLS9HtMlyQZMgueX2NE"
+GOOGLE_API_KEY = "AIzaSyCCLzb24E4fuJLwdeq94Zu9JPSkiozifso"
 CUSTOM_SEARCH_ENGINE_ID = "c56f8f041442444b7"
 
+# Home View
 def home(request):
     return render(request, 'home.html')
 
@@ -958,8 +959,16 @@ def search_pdf(request):
     search_word = request.GET.get('search_word', '').strip()
 
     def result_stream():
+        book_found = False
         for result in search_pdfs(search_word):
+            if "no_books_found" in result:
+                yield f"data: {json.dumps(result)}\n\n"
+                break
             yield f"data: {json.dumps(result)}\n\n"
+            book_found = True
+        
+        if not book_found:
+            yield f"data: {json.dumps({'no_books_found': True})}\n\n"
 
     return StreamingHttpResponse(result_stream(), content_type='text/event-stream')
 
@@ -975,9 +984,19 @@ def search_youtube(request):
     youtube_results = fetch_youtube_results(search_word)
     return JsonResponse({"youtube_results": youtube_results})
 
-# PDF Search Logic
+# Optimized PDF Search Logic
 def search_pdfs(search_word):  
     pdf_files = [f for f in os.listdir(PDF_DIR) if f.endswith(".pdf")][:100]
+
+    # Title Matching for Faster Results
+    for file in pdf_files:
+        if search_word.lower() in file.lower():  
+            yield {
+                "book_name": file.replace(".pdf", ""),
+                "book_cover": f"/static/covers/{file.replace('.pdf', '.png')}",
+                "download_link": f"/download/{file}"
+            }
+            return  # Exit early once a title match is found
 
     def search_file(file):
         pdf_path = os.path.join(PDF_DIR, file)
@@ -988,13 +1007,27 @@ def search_pdfs(search_word):
                 "book_cover": cover_image if cover_image else "/static/default_cover.jpg",
                 "download_link": f"/download/{file}"
             }
+        return None
 
-    with ThreadPoolExecutor(max_workers=10) as executor:  
+    with ThreadPoolExecutor(max_workers=10) as executor:
         futures = {executor.submit(search_file, file): file for file in pdf_files}
+
+        book_found = False
         for future in as_completed(futures):
-            result = future.result()
-            if result:
-                yield result
+            if book_found:
+                break  # Stop further checks once a book is found
+
+            try:
+                result = future.result(timeout=3)  # Timeout for faster detection
+                if result:
+                    book_found = True
+                    yield result  # Send result immediately
+            except TimeoutError:
+                print(f"Timeout error on file: {futures[future]}")
+                continue
+
+        if not book_found:
+            yield {"no_books_found": True}
 
 # PDF Search with Cover Extraction
 def search_word_in_pdf(pdf_path, search_word):
@@ -1068,13 +1101,14 @@ def fetch_youtube_results(query):
     except Exception:
         return []
 
+# File Download
 def download(request, book_name):
     pdf_path = os.path.join(PDF_DIR, book_name)
     if not os.path.exists(pdf_path):
         return JsonResponse({"error": "File not found."}, status=404)
     return FileResponse(open(pdf_path, 'rb'), as_attachment=True)
 
-
+# Results view
 def search_results(request):
     query = request.GET.get('search_word', '')
     context = {'query': query}
