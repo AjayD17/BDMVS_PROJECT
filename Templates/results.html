@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-
+    <title>Search Results</title>
 </head>
 <body>
 
-    <!-- Smaller Search Container -->
+    <!-- Search Container -->
     <div class="search-container" 
      style="
-         padding: 20px; /* Increased padding for spacious look */
+         padding: 20px; 
          margin-bottom: 5px; 
          margin-top: 5px;
          text-align: center; 
-         max-width: 700px; /* Significantly increased width */
-         width: 75%; /* Maintains responsiveness */
+         max-width: 700px; 
+         width: 75%;
          margin-left: auto;
          margin-right: auto;
      ">
@@ -32,10 +32,10 @@
                    border-radius: 20px;
                    font-size: 2.2vh;
                    background-color: #ffffff;
-                   color: #0452fd;"required>
+                   color: #0452fd;" required>
         <button type="submit"
-                style="padding: 8px 16px; color: #fff; border: none; border-radius: 20px; cursor: pointer;gap:20px;
-                background-color:rgb(240, 59, 59)">
+                style="padding: 8px 16px; color: #fff; border: none; border-radius: 20px; cursor: pointer;
+                background-color: rgb(240, 59, 59)">
             Search
         </button>
     </form>
@@ -46,8 +46,7 @@
         <div id="book-results" class="panel left-panel">
             <h2>📚 Related Books</h2>
             <div id="pdf-results-container">
-                
-                <p>Loading PDF results...</p>  <!-- Placeholder for async results -->
+                <p>Loading PDF results...</p>
             </div>
         </div>
 
@@ -55,8 +54,7 @@
         <div id="google-results" class="panel left-panel">
             <h2>🌐 Google Search</h2>
             <div id="google-results-container">
-                
-                <p>Loading Google results...</p>  <!-- Placeholder for async results -->
+                <p>Loading Google results...</p>
             </div>
         </div>
 
@@ -64,8 +62,7 @@
         <div id="video-results" class="panel right-panel">
             <h2>🎬 Related Videos</h2>
             <div id="youtube-results-container">
-                
-                <p>Loading YouTube results...</p>  <!-- Placeholder for async results -->
+                <p>Loading YouTube results...</p>
             </div>
         </div>
     </div>
