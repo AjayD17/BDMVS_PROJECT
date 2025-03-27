@@ -712,6 +712,7 @@
     width: 350px;
 }
 
+
 /* Search Page Styling */
 body {
     font-family: Arial, sans-serif;
@@ -762,7 +763,7 @@ button:hover {
 }
 
 .no-books .container {
-    grid-template-columns: 1fr 1fr; /* Split screen into 2 columns */
+    grid-template-columns: 1fr 1fr;
 }
 
 .panel {
@@ -807,7 +808,29 @@ button:hover {
     background-color: #f9f9f9;
     height: 120px;
     box-sizing: border-box;
+
+    /* Progressive Loading Effect */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease forwards;
 }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.result:nth-child(1) { animation-delay: 0.1s; }
+.result:nth-child(2) { animation-delay: 0.2s; }
+.result:nth-child(3) { animation-delay: 0.3s; }
+.result:nth-child(4) { animation-delay: 0.4s; }
+.result:nth-child(5) { animation-delay: 0.5s; }
 
 .book-cover, .video-thumbnail, .google-thumbnail {
     width: 100px;
@@ -822,7 +845,7 @@ button:hover {
     flex-direction: column;
     justify-content: center;
     text-align: left;
-    flex-grow: 1; 
+    flex-grow: 1;
 }
 
 .book-info h4, .video-info h4, .google-info h4 {
@@ -861,13 +884,12 @@ button:hover {
 }
 
 .hidden {
- 
     display: none;
 }
 
 .no-books {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
@@ -875,7 +897,7 @@ button:hover {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 200px; /* Adjust width as needed */
+    max-width: 200px;
     display: inline-block;
 }
 
@@ -892,18 +914,15 @@ button:hover {
     color: #fff;
     padding: 8px 12px;
     border-radius: 5px;
-    white-space: normal; /* Allows multi-line text */
-    max-width: 300px;  /* Expanded for longer content */
+    white-space: normal;
+    max-width: 300px;
     overflow: visible;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
 
-    /* Positioning Improvements */
-    top: 100%;      /* Below the truncated text */
-    left: 50%;      /* Center the tooltip */
-    transform: translateX(-50%); /* Ensures tooltip centers properly */
-    z-index: 999;   /* Ensures tooltip stays on top */
-
-    /* Prevent Tooltip Cutoff */
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
     word-wrap: break-word;
-    white-space: normal;
 }
+
