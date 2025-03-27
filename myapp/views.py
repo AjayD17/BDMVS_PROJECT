@@ -975,6 +975,7 @@ def upload_files(request):
 #                 book.save(update_fields=['image'])
 
 #     return render(request, 'books.html', {'books': books, 'category': category})
+
 # Directory Setup
 import os
 import json
@@ -1172,3 +1173,9 @@ def search_results(request):
     query = request.GET.get('search_word', '')
     context = {'query': query}
     return render(request, 'results.html', context)
+    # return render(request, 'results.html', context)
+
+# Results view
+def search(request):
+    search_word = request.GET.get('search_word', '').strip()
+    return render(request, 'results.html', {'query': search_word})

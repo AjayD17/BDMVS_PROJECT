@@ -711,6 +711,7 @@
     border-radius: 16px;
     width: 350px;
 }
+/*search*/
 
 
 /* Search Page Styling */
@@ -768,12 +769,12 @@ button:hover {
 
 .panel {
     background-color: white;
-    border-radius: 12px;
+    border-radius: 12px ;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
     height: 450px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow-y: auto; /* Vertical scroll only */
+    overflow-x: hidden; /* Horizontal scroll removed */
     position: relative;
     text-align: center;
 }
