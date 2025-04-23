@@ -35,6 +35,19 @@ urlpatterns = [
     path('submit-feedback/', views.submit_feedback, name="submit_feedback"),  # New feedback URL
     path('navbar/', views.navbar, name="navbar"),
 
+    # Drop-downs:
+    path('bdmvs-fasta', views.bdmvs_fasta, name='bdmvs-fasta'),
+
+    # Uniprot:
+    path('search_protein', views.search_protein, name='search_protein'), 
+
+    # Dashboards:
+    path('dashboard', views.dashboard_view, name='dashboard'),
+    path('show-data/<str:category>/', views.show_data_view, name='show_data'),
+
+    # BDMVS PDB:
+    path('view_protein', views.view_protein, name='view_protein'),
+
     # Json Files Uploads:
     path('uploads/', views.upload_json, name='upload_json'),
     path('json-detail/<int:id>/', views.json_detail, name='json_detail'),

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Protein Structure Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/ngl@2.0.0-dev.39/dist/ngl.js"></script>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-q4Q0X1uhKxH+WY8U8nKX0oLNUa9bmgI4Z59cUVGkK3U5FEAK2Va4zJcHXQK1rNfD" crossorigin="anonymous">
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-VGPsn5uHzoB+lKPJNUWFM1oK8GejqekYK2pFwDw5gj9e/tnm6ZG2d6sOwZb5zXkz" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #3aaeae; /* black background */
+            color: #fff;
+            padding: 20px;
+        }
+
+        h2, h3 {
+            text-align: center;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .viewer-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        #viewport {
+            flex: 1;
+            height: 300px;
+            background-color: #222;
+            border-radius: 8px;
+            cursor: move;
+        }
+
+        .info-box {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            color: black;
+            border-radius: 8px;
+        }
+
+        .info-box p {
+            margin: 10px 0;
+        }
+
+        .error {
+            color: red;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 250px;
+        }
+
+        button {
+            padding: 8px 16px;
+            margin-left: 10px;
+        }
+
+        /* Style for empty results */
+        .no-results {
+            text-align: center;
+            color: #ff6347; /* Red */
+        }
+
+        .info-box {
+    background-color: white;
+    color: black;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+    </style>
+</head>
+<body>
+    <h2>BDMVS Structure Viewer</h2>
+
+    <form method="get">
+        <input type="text" name="pdb_id" placeholder="Enter PDB ID (e.g., 1crn)" required>
+        <button type="submit">View Structure</button>
+    </form>
+
+    {% if pdb_id %}
+        <h3>Protein Structure (PDB ID: {{ pdb_id }})</h3>
+
+        <div class="viewer-container">
+            <div id="viewport"></div>
+
+            <div class="info-box d-flex flex-column justify-content-center">
+                {% if protein_info.error %}
+                    <p class="error">{{ protein_info.error }}</p>
+                {% else %}
+                    <p><strong>Title:</strong> {{ protein_info.title }}</p>
+                    <p><strong>Method:</strong> {{ protein_info.method }}</p>
+                    <p><strong>Resolution:</strong> {{ protein_info.resolution }} Å</p>
+                    <p><strong>Deposition Date:</strong> {{ protein_info.deposition_date }}</p>
+                    <p><strong>Release Date:</strong> {{ protein_info.release_date }}</p>
+                    <p><strong>Authors:</strong> {{ protein_info.authors }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <script>
+            const stage = new NGL.Stage("viewport");
+
+            stage.loadFile("https://files.rcsb.org/download/{{ pdb_id }}.pdb", {
+                defaultRepresentation: true
+            }).then(function(component) {
+                component.autoView();
+            });
+
+            // Enable zooming and mouse controls
+            const viewport = document.getElementById("viewport");
+            stage.handleResize();  // Handle resizing of the viewport
+
+            // Set up zoom controls (using the NGL viewer's default controls)
+            stage.mouseControls = NGL.MOUSE.CONTROLS_ALL;
+        </script>
+    {% else %}
+        <div class="no-results">
+            <h4 style="color:black">Please enter a PDB ID to view the protein structure.</h4>
+        </div>
+    {% endif %}
+</body>
+</html>

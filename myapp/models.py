@@ -179,3 +179,21 @@ class BookFile(models.Model):
 #             return urljoin(settings.MEDIA_URL, self.image.name)
 #         return urljoin(settings.MEDIA_URL, "covers/default_book.png")
 
+from django.db import models
+
+class SequenceAnalysis(models.Model):
+    sequence = models.TextField()
+    result = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Analysis on {self.created_at}"
+
+class Proteins(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    sequence = models.TextField()
+    source = models.CharField(max_length=255, blank=True, null=True)  # Example: "NCBI", "UniProt"
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name

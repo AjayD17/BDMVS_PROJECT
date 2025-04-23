@@ -1118,3 +1118,370 @@ def search_results(request):
 def search(request):
     search_word = request.GET.get('search_word', '').strip()
     return render(request, 'results.html', {'query': search_word})
+
+from django.shortcuts import render
+from django import forms
+from Bio.Seq import Seq
+from Bio.SeqUtils import molecular_weight
+from Bio.SeqUtils.ProtParam import ProteinAnalysis
+import os
+
+# Custom Form to include sequence and sequenceType
+class SequenceForm(forms.Form):
+    sequenceType = forms.ChoiceField(
+        choices=[('protein', 'Protein'), ('dna', 'DNA')],
+        widget=forms.RadioSelect,
+        required=True
+    )
+    sequence = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 8, "cols": 60}),
+        label="Enter your FASTA sequence",
+        required=False
+    )
+    sequenceFile = forms.FileField(required=False)
+
+import io
+
+def bdmvs_fasta(request):
+    result = {}
+    error_message = None
+    form = SequenceForm()
+
+    if request.method == "POST":
+        form = SequenceForm(request.POST)
+        uploaded_file = request.FILES.get("sequenceFile")
+        text_input = request.POST.get("sequence", "").strip().upper()
+
+        # Prioritize file if uploaded, else use text input
+        if uploaded_file:
+            file_content = uploaded_file.read().decode("utf-8")
+            lines = file_content.strip().splitlines()
+            sequence = ''.join(line for line in lines if not line.startswith(">")).upper()
+        else:
+            sequence = text_input
+
+        if form.is_valid() and sequence:
+            selected_type = form.cleaned_data["sequenceType"]
+
+            try:
+                if selected_type == "dna":
+                    if set(sequence) <= {"A", "T", "G", "C"}:
+                        seq_type = "DNA"
+                    elif set(sequence) <= {"A", "U", "G", "C"}:
+                        seq_type = "RNA"
+                    else:
+                        raise ValueError("Invalid DNA/RNA sequence format.")
+
+                    bio_seq = Seq(sequence)
+
+                    result = {
+                        "Original Sequence": sequence,
+                        "Reverse Complement": str(bio_seq.reverse_complement()) if seq_type == "DNA" else "N/A (RNA sequence)",
+                        "Transcription (RNA)": str(bio_seq.transcribe()) if seq_type == "DNA" else "Already RNA",
+                        "Translation (Protein)": str(bio_seq.translate(to_stop=True))
+                    }
+
+                elif selected_type == "protein":
+                    valid_aas = {"A", "R", "N", "D", "C", "Q", "E", "G", "H", "I",
+                                 "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V"}
+                    if not set(sequence).issubset(valid_aas):
+                        raise ValueError("Invalid protein sequence format.")
+
+                    analysis = ProteinAnalysis(sequence)
+                    molecular_wt = molecular_weight(sequence, seq_type="protein")
+
+                    result = {
+                        "Number of Amino Acids": len(sequence),
+                        "Molecular Weight": round(molecular_wt, 2),
+                        "Theoretical pI": round(analysis.isoelectric_point(), 2),
+                        "Amino Acid Composition": analysis.count_amino_acids(),
+                        "Instability Index": round(analysis.instability_index(), 2),
+                        "Grand Average Hydropathicity (GRAVY)": round(analysis.gravy(), 3)
+                    }
+            except Exception as e:
+                error_message = f"Error: {str(e)}"
+
+            return render(request, "fasta_results.html", {"result": result, "error_message": error_message})
+
+    return render(request, "fasta.html", {"form": form})
+
+
+# uniprot:
+import requests
+from django.shortcuts import render
+from .models import Proteins  # Ensure you have a Protein model
+
+from django.shortcuts import render
+from .models import *
+
+def search_protein(request):
+    query = request.GET.get('query', '').strip()
+
+    if not query:
+        return render(request, 'uniprot.html', {'error': 'Please enter a protein name.'})
+
+    # Check local database for proteins
+    proteins = Proteins.objects.filter(name__icontains=query)
+
+    if proteins.exists():
+        return render(request, 'uniprot.html', {
+            'proteins': proteins, 
+            'query': query,
+            'count': proteins.count(),
+            'data_type': 'Protein'
+        })
+
+    # If not found, fetch from UniProt
+    external_data = fetch_protein_from_uniprot(query)
+
+    if external_data:
+        return render(request, 'uniprot.html', {
+            'proteins': external_data,
+            'query': query,
+            'count': len(external_data),
+            'data_type': 'Protein'
+        })
+
+    return render(request, 'uniprot.html', {
+        'query': query, 
+        'message': 'No data found.',
+        'count': 0,
+        'data_type': 'Protein'
+    })
+
+
+def fetch_protein_from_uniprot(query):
+    """Fetch protein data from UniProt API with more detailed fields."""
+    url = f"https://rest.uniprot.org/uniprotkb/search?query={query}&format=json&size=10"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        proteins = []
+
+        for entry in data.get("results", []):
+            protein_info = {
+                "name": entry.get("proteinDescription", {})
+                                .get("recommendedName", {})
+                                .get("fullName", {})
+                                .get("value", "N/A"),
+                "uniprot_id": entry.get("primaryAccession", "N/A"),
+                "organism": entry.get("organism", {}).get("scientificName", "N/A"),
+                "gene_name": entry.get("genes", [{}])[0].get("geneName", {}).get("value", "N/A") if entry.get("genes") else "N/A",
+                "sequence_length": entry.get("sequence", {}).get("length", "N/A"),
+                "function": "N/A"  # Optional: This would require an additional call to detailed endpoint
+            }
+
+            proteins.append(protein_info)
+
+        return proteins
+
+    return None
+
+# Dashboard-view:
+from django.shortcuts import render
+import requests
+import json
+from collections import Counter
+
+API_KEY = "AIzaSyDR4jGJHp7kaHFyOJfy99hKV3UXLHvyu-c"
+SHEET_ID = "1J2P_DDmpbrkTQzgykXXlr4e9winAk7yMqu7z70KFchU"
+
+CATEGORY_RANGES = {
+    'protein': 'Proteins!A1:C100',
+    'genome': 'Genomes!A1:C100',
+    'nucleotide': 'Nucleotide!A1:C100',
+    'pubchem': 'PubChem!A1:C100',
+    'taxonomy': 'Taxonomy!A1:C100',
+    'blast': 'BLAST!A1:C100',
+}
+
+def fetch_sheet_data(sheet_id, range_name, api_key):
+    print("fetch_sheet_data")
+    print(sheet_id)
+    print(range_name)
+    print(api_key)
+    url = f"https://sheets.googleapis.com/v4/spreadsheets/{sheet_id}/values/{range_name}?key={api_key}"
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.json()
+
+def dashboard_view(request):
+    category = request.GET.get('category', '').lower()
+    subcategory = request.GET.get('subcategory', '').strip()
+    chart_data_all = {"labels": [], "values": []}
+    chart_data_top5 = {"labels": [], "values": []}
+    category_totals = {}
+    subcategory_set = set()
+
+    # Calculate totals for each category
+    for cat, range_name in CATEGORY_RANGES.items():
+        print("CATEGORY_RANGES")
+        print(cat)
+        print(range_name)
+        print(CATEGORY_RANGES)
+        try:
+            sheet_data = fetch_sheet_data(SHEET_ID, range_name, API_KEY)
+            print("Sheet data", sheet_data)
+            values = sheet_data.get("values", [])
+            print("Sheet data values", values)
+            if not values or len(values) <= 1:
+                continue
+            total = sum(
+                float(row[2]) for row in values[1:]
+                if len(row) >= 3 and row[2].replace('.', '', 1).isdigit()
+            )
+            category_totals[cat] = total
+            print(category_totals)
+        except Exception as e:
+            print(f"Error fetching data for {cat}: {e}")
+            category_totals[cat] = 0
+    # Load selected category data and prepare chart entries
+    if category in CATEGORY_RANGES:
+        try:
+            sheet_data = fetch_sheet_data(SHEET_ID, CATEGORY_RANGES[category], API_KEY)
+            values = sheet_data.get("values", [])
+            rows = values[1:] if values and len(values) > 1 else []
+            # print(rows)
+            entries = []
+            a= 0
+            for row in rows:
+                if len(row) >= 3:
+                    print(row)
+                    main_cat = row[0].strip()
+                    label = row[1].strip()
+                    try:
+                        value = float(row[2])
+                    except ValueError:
+                        continue
+
+                    subcategory_set.add(main_cat)
+                    print(a)
+                    if main_cat:
+                        print("a= 0")
+                        a= 0
+                        #print(f"Main Category: {main_cat}, Label: {label}, Value: {value}\n {(main_cat.lower() == subcategory.lower() or a==1),a}\n")
+                    # if a:
+                    if main_cat.lower() == subcategory.lower():
+                        a= 1
+                        #print('a=1',a)
+                        entries.append((f"{label} ({main_cat})", value))
+                        print("Entries")
+                        print(entries)
+                    elif a:
+                        print('here')
+                        entries.append((f"{label} ({main_cat})", value))
+                    # else:
+                    #     entries.append((f"{label} ({main_cat})", value))
+            if entries:
+                all_labels, all_values = zip(*entries)
+                chart_data_all = {"labels": entries, "values": all_values}
+
+                top_entries = sorted(entries, key=lambda x: x[1], reverse=True)[:5]
+                top_labels, top_values = zip(*top_entries)
+                chart_data_top5 = {"labels": top_labels, "values": top_values}
+
+        except Exception as e:
+            print(f"Error processing category {category}: {e}")
+            subcategory_set = set()
+    print(chart_data_all)
+    return render(request, "dashboard.html", {
+        "selected_category": category,
+        "selected_subcategory": subcategory,
+        "chart_data_all": json.dumps(chart_data_all),
+        "chart_data_top5": json.dumps(chart_data_top5),
+        "categories": CATEGORY_RANGES,
+        "category_totals": category_totals,
+        "subcategories": sorted(subcategory_set),
+    })
+
+def show_data_view(request, category):
+    category = category.lower()
+    range_name = CATEGORY_RANGES.get(category)
+    table_data = {'headers': [], 'rows': []}
+
+    try:
+        if not range_name:
+            raise ValueError("Invalid category selected.")
+
+        sheet_data = fetch_sheet_data(SHEET_ID, range_name, API_KEY)
+        values = sheet_data.get("values", [])
+        if not values or len(values) <= 1:
+            raise ValueError("No data found.")
+
+        headers = values[0]
+        rows = values[1:]
+
+        category_counts = Counter()
+        current_category = None
+
+        for row in rows:
+            if len(row) >= 3:
+                if row[0].strip():
+                    current_category = row[0].strip()
+                category_counts[current_category] += 1
+
+        grouped_rows = []
+        seen = set()
+        current_category = None
+
+        for row in rows:
+            if len(row) >= 3:
+                category_cell = row[0].strip() if row[0].strip() else current_category
+                current_category = category_cell
+
+                entry = {
+                    "category": category_cell,
+                    "name": row[1],
+                    "count": row[2],
+                    "show_category": category_cell not in seen,
+                    "rowspan": category_counts[category_cell] if category_cell not in seen else 0
+                }
+
+                if entry["show_category"]:
+                    seen.add(category_cell)
+
+                grouped_rows.append(entry)
+
+        table_data = {
+            'headers': headers,
+            'rows': grouped_rows
+        }
+
+    except Exception as e:
+        print("Error in show_data_view:", str(e))
+
+    return render(request, "show_data.html", {
+        "category": category,
+        "table_data": table_data
+    })
+
+
+# PDB_STRUCTURES:
+import requests
+from django.shortcuts import render, redirect
+
+def view_protein(request):
+    pdb_id = request.GET.get('pdb_id', '').lower()
+    protein_info = {}
+
+    if pdb_id:
+        # Fetch basic structure info from RCSB PDB REST API
+        url = f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            protein_info = {
+                'title': data.get('struct', {}).get('title', 'N/A'),
+                'method': data.get('exptl', [{}])[0].get('method', 'N/A'),
+                'resolution': data.get('rcsb_entry_info', {}).get('resolution_combined', ['N/A'])[0],
+                'deposition_date': data.get('rcsb_accession_info', {}).get('deposit_date', 'N/A'),
+                'release_date': data.get('rcsb_accession_info', {}).get('initial_release_date', 'N/A'),
+                'authors': ', '.join(set(author.get('name', 'N/A') for author in data.get('audit_author', [])))
+            }
+        else:
+            protein_info = {'error': f"Protein with ID '{pdb_id.upper()}' not found."}
+
+    return render(request, 'view.html', {'pdb_id': pdb_id.upper(), 'protein_info': protein_info})
+

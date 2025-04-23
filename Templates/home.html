@@ -399,33 +399,8 @@ footer p {
   #menu__btn {
     display: initial;
   }
-  .nav__bar .navbar {
-    position: absolute;
-    top: 100%;
-    right: 0rem;
-    border-radius: 0.5rem;
-    width: 30rem;
-    background: var(--clr-one);
-    display: inline;
-    text-align: center;
-    padding-top: 2rem;
-    border: 2px solid var(--clr-font);
-    transform: scale(0);
-    opacity: 0;
-    transition: none;
-    transform-origin: top right;
-  }
-  .nav__bar .navbar.active {
-    transform: scale(1);
-    opacity: 1;
-    transform-origin: 0.2s ease-out;
-  }
-  .nav__bar ul li {
-    padding-bottom: 1.5rem;
-  }
-  .nav__bar ul {
-    display: none;
-  }
+  /* General Navbar Styling */
+
   .home .home__first {
     padding-top: 0;
   }
@@ -771,7 +746,7 @@ button:hover {
             text-align: center;
             border-radius: 10px;
             padding-left:5vh;
-            padding-top:10vh;
+            padding-top:6vh;
         }
 
         #about-us h3 {
@@ -786,7 +761,6 @@ button:hover {
             text-align: justify;
             font-size: 2.5vh;
             line-height: 1.6;
-            padding-top: 1vh;
             padding-left:10vh;
             padding-right:10vh;
         }
@@ -901,70 +875,357 @@ button:hover {
                 width: 100%;
             }
         }
-        
+
+        /* Style for Active Page */
+        .nav-item.active .nav-link {
+            color: #ffc107 !important;
+        }
+
+        .bio-images img {
+            width: 100%;
+            height: auto;
+            max-width: 300px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+
+        .custom-dropdown {
+            margin-right: 20px;
+            margin-top: 10px;
+        }
+
+        .profile-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            font-size: 2.5vh;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            border: 3px solid #007bff;
+            margin: auto;
+        }
+
+        /* Navbar */
+        .nav__bar {
+        background-color: #fff;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+    }
+    
+    /* Dropdown Menu */
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    /* Navbar Links */
+    .navbar li a {
+        color: #333;
+        font-size: 16px;
+        font-weight: 500;
+        text-transform: uppercase;
+        padding: 10px 20px;
+        transition: background-color 0.3s ease;
+    }
+
+    .navbar li a:hover {
+        background-color: #f0f0f0;
+        border-radius: 5px;
+    }
+
+    /* Logo Styling */
+    .logo img {
+        height: 8vh;
+    }
+
+    .logo h4 {
+        padding-left: 1vh;
+        padding-top: 2vh;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+
+    /* Login Button */
+    .nav-link {
+        padding: 10px 20px;
+        color: white;
+        border-radius: 5px;
+    }
+
+    .nav-link:hover {
+        background-color: #3f51b5;
+    }
+
+    .dropdown:hover .dropdown-content {
+    display: block;
+  }
+
+  /* Hero/Home Section */
+  #Home{
+    display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  }
+.home-section {
+  background-color: #1b9c85; /* soft mint background */
+}
+
+/* Section Title */
+.section-title {
+  color: #02977d;
+  font-weight: 800;
+  font-size: 2rem;
+}
+
+/* Section Description */
+.section-description {
+  font-size: 1.1rem;
+  color: #333;
+  margin-top: 1rem;
+  text-align: justify;
+}
+
+/* Search Input */
+.search-input {
+  max-width: 360px;
+  padding: 12px 20px;
+  border: 2px solid #02977d;
+  border-radius: 30px;
+  background-color: #ffffff;
+  color: #333;
+  font-size: 1rem;
+  transition: 0.3s ease;
+}
+
+.search-input::placeholder {
+  color: #999;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #027d6a;
+  box-shadow: 0 0 0 0.2rem rgba(2, 151, 125, 0.25);
+  padding: 12px 25px;
+}
+
+/* Search Button */
+.search-btn {
+  background-color: #02977d;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-size: 1rem;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.search-btn:hover {
+  background-color: #027d6a;
+}
+
+/* Logo */
+.logo-img {
+  max-width: 100%;
+}
+
+.container {
+    margin-top: 2vh;
+}
+
+/* Base dropdown styles */
+.custom-dropdown-list,
+.about-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: black; /* Set background to black */
+  min-width: 150px;
+  padding: 10px 0;
+  z-index: 1000;
+  border-radius: 8px;
+  text-align: center;
+  color: white; /* Set default text color to white */
+}
+
+.about-dropdown {
+  min-width: 500px; /* Wider for About content */
+}
+
+/* Show on hover */
+.dropdown-hover:hover > .custom-dropdown-list,
+.dropdown-hover:hover > .about-dropdown {
+  display: block;
+}
+
+/* Dropdown items */
+.custom-dropdown-list li,
+.custom-dropdown-list .dropdown-item {
+  padding: 8px 16px;
+  color: white; /* White text */
+  text-decoration: none;
+  white-space: nowrap;
+  display: block;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  background-color: black; /* Ensure background is black */
+}
+
+.custom-dropdown-list li:hover,
+.custom-dropdown-list .dropdown-item:hover {
+  background-color: #222; /* Slightly lighter on hover */
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* Paragraph inside About dropdown */
+.about-dropdown p {
+  color: white;
+  margin: 0;
+  padding: 10px 16px;
+  text-align: center;
+  background-color: black;
+}
+
+/* HR styles between list items */
+.custom-dropdown-list hr {
+  border: none;
+  height: 1px;
+  background-color: #666;
+  margin: 4px 16px;
+}
+
   </style>
   <body>
-    <nav class="nav__bar">
-      <div class="logo">
-        <img src="{% static 'Images/Logo.png' %}" style="height:8vh; padding-top:0vh; padding-left:4vh;">
-        <h4 style="padding-left:1vh; padding-top:2vh; font-weight: bold;">BDMVS</h4>
-      </div>
-      <ul class="navbar" style="padding-top:2.5vh; padding-right:2vh;">
-        <li><a href="#Home" style="text-decoration: none;">Home</a></li>
-        <li><a href="#about-us" style="text-decoration: none;">About</a></li>
-        <li><a href="#popular-resources" style="text-decoration: none;">Popular Resources</a></li>
-        <li><a href="#Book" style="text-decoration: none;">Books</a></li>
-        <li><a href="#questions" style="text-decoration: none;">Q & A</a></li>
-        <li><a href="{% url 'signup' %}" style="text-decoration: none;">Login</a></li>
-      </ul>
-      <div id="menu__btn" class="fas fa-bars"></div>
-    </nav>  Why login profile photo is not showable plse if once i login then i want to showed the login profile pictures give me the related codes...?
-    
-    <section id="Home">
-      <div class="home">
-        <div class="home__first pt-4 pb-4" style="margin-top:17vh;">
-          <h5 class="pb-2"><b>BIOLOGICAL DEVELOPMENT MANAGEMENT & VISUALIZATION SYSTEM</b></h5>
-          <p style="text-align: justify; font-size: 3vh; margin-top:2.5vh;">
-            Empowering biological research through seamless data management and visualization.
-          </p>
-         
- <form id="searchForm" method="GET" action="{% url 'search' %}">
-  <input type="text" id="search_word" name="search_word"
-         placeholder="Describe what you want to see"
-         style="
-             padding: 9px 20px;
-             width: 100%;
-             max-width: 350px;
-             border: 2px solid #1b9c85;
-             border-radius: 30px;
-             font-size: 2.7vh;
-             background-color: #f0fdf4;
-             color: black;
-             margin-right:1vh;
-         "
-         required>
-  <button type="submit" class="theme-btn btn-one"
-          style="border-radius: 30px; font-size:2.7vh; padding-top:1.5vh; padding-bottom:1.5vh; color:white; background-color: #1b9c85;">
-      Search
-  </button>
-</form>
-
-        
-
-        
-        
-        
-        
-          <!-- <div class="">
-            <input type="text" name="text" placeholder="Describe what you want to see" required>
-            <button type="submit" class="theme-btn btn-one" style="color:#1b9c85; font-weight: bold; border-radius: 30px; font-size: 2.5vh; padding-top: 1vh; padding-bottom:1vh;">Search</button>
-        </div> -->
+    <nav class="navbar navbar-expand-lg pt-4 pb-4">
+      <div class="container-fluid">
+        <div class="logo d-flex align-items-center">
+          <img src="{% static 'Images/Logo.png' %}" style="height: 8vh; padding-left: 4vh;">
+          <h4 style="padding-left: 1vh; padding-top: 2vh; font-weight: bold;">BDMVS</h4>
         </div>
-        <div class="home__second">
-          <img src="{% static 'Images/Logo.png' %}" style="padding-left:5vh; width:75%; margin-top:12vh;" />
+    
+        <!-- Toggle button for mobile view -->
+        <button class="navbar-toggler navbar-dark bg-dark text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon text-white"></span>
+        </button>
+    
+        <!-- Navbar links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto d-flex align-items-center">
+            <li class="nav-item">
+              <a class="nav-link" href="#Home" style="padding: 10px 20px;">Home</a>
+            </li>
+            <!-- NAVBAR START -->
+
+  <!-- ABOUT -->
+  <li class="nav-item position-relative dropdown-hover text-center">
+    <a class="nav-link" href="#about-us" style="padding: 10px 20px;">About</a>
+    <div class="about-dropdown text-center">
+      <p class="text-white px-3">
+        The Biological Development Management & Visualization System (BDMVS) is an advanced platform designed to manage, analyze, and visualize biological data efficiently. It enables researchers to search, retrieve, and explore protein-related information from extensive biological databases, providing valuable insights into molecular structures and interactions. The system incorporates interactive visualization tools, allowing users to examine complex protein structures in detail.
+      </p>
+    </div>
+  </li>
+
+  <!-- POPULAR RESOURCES -->
+  <li class="nav-item position-relative dropdown-hover text-center">
+    <a class="nav-link" href="#popular-resources" style="padding: 10px 20px;">Popular Resources</a>
+    <ul class="custom-dropdown-list text-center">
+      <li><a class="dropdown-item text-white" href="/category/?category=protein">Protein</a></li>
+      <hr>
+      <li><a class="dropdown-item text-white" href="/category/?category=genome">Genome</a></li>
+      <hr>
+      <li><a class="dropdown-item text-white" href="/category/?category=nucleotide">Nucleotide</a></li>
+      <hr>
+      <li><a class="dropdown-item text-white" href="/category/?category=taxonomy">Taxonomy</a></li>
+      <hr>
+      <li><a class="dropdown-item text-white" href="/category/?category=pubchem">Pubchem</a></li>
+      <hr>
+      <li><a class="dropdown-item text-white" href="/category/?category=blast">Blast</a></li>
+    </ul>
+  </li>
+
+  <!-- BOOKS -->
+  <li class="nav-item position-relative dropdown-hover text-center">
+    <a class="nav-link" href="#books" style="padding: 10px 20px;">Books</a>
+    <ul class="custom-dropdown-list text-center">
+      <li><a class="dropdown-item text-white" href="/books/?category=Protein">Protein Books</a></li>
+      <hr>
+      <li><a class="dropdown-item text-white" href="/books/?category=Genome">Genome Books</a></li>
+      <hr>
+      <li><a class="dropdown-item text-white" href="/books/?category=Nucleotide">Nucleotide Books</a></li>
+      <hr>
+      <li><a class="dropdown-item text-white" href="/books/?category=Taxonomy">Taxonomy Books</a></li>
+      <hr>
+      <li><a class="dropdown-item text-white" href="/books/?category=Pubchem">Pubchem Books</a></li>
+      <hr>
+      <li><a class="dropdown-item text-white" href="/books/?category=Blast">Blast Books</a></li>
+    </ul>
+  </li>
+
+  <!-- SOLUTIONS -->
+  <li class="nav-item position-relative dropdown-hover text-center">
+    <a class="nav-link" href="#" style="padding: 10px 20px;">Solutions</a>
+    <ul class="custom-dropdown-list text-center">
+      <li><a class="dropdown-item text-white" href="{% url 'search_protein' %}">BDMVS Visual</a></li>
+      <li><a class="dropdown-item text-white" href="{% url 'view_protein' %}">BDMVS Structure</a></li>
+      <li><a class="dropdown-item text-white" href="{% url 'dashboard' %}">BDMVS Dashboard</a></li>
+      <li><a class="dropdown-item text-white" href="{% url 'bdmvs-fasta' %}">BDMVS Analyzer</a></li>
+    </ul>
+  </li>
+
+            <!-- Login Button -->
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'signup' %}" style="padding: 10px 20px; background-color: #5c6bc0; color: white; border-radius: 5px;">Login</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    
+    <section id="Home" style="background-color: #e1f0da;">
+      <div class="container">
+        <div class="row align-items-center">
+          <!-- Left Column: Text + Search -->
+          <div class="col-12 col-md-7 mb-4">
+            <h5 class="section-title">BIOLOGICAL DEVELOPMENT MANAGEMENT & VISUALIZATION SYSTEM</h5>
+            <p class="section-description mt-4">
+              Empowering biological research through seamless data management and visualization.
+            </p>
+    
+            <form id="searchForm" method="GET" action="{% url 'search' %}" class="d-flex flex-column flex-sm-row align-items-start mt-4">
+              <input type="text" id="search_word" name="search_word"
+                     placeholder="Describe what you want to see"
+                     class="form-control search-input me-sm-2 mb-3 mb-sm-0 mt-2" style="padding-top: 3.5vh; padding-bottom: 3.5vh;"
+                     required>
+              <button type="submit" class="theme-btn btn-one search-btn">
+                Search
+              </button>
+            </form>
+          </div>
+    
+          <!-- Right Column: Image -->
+          <div class="col-12 col-md-5 text-center">
+            <img src="{% static 'Images/Logo.png' %}" alt="Logo" class="img-fluid logo-img pl-" style="height:65vh; width:100%;">
+          </div>
+    
         </div>
       </div>
     </section>
+    
 
     <section id="about-us">
       <h3>About</h3>
@@ -1216,6 +1477,17 @@ button:hover {
   </body>
 </html>
 <script>
+    document.querySelector('.nav-item.dropdown').addEventListener('mouseenter', function() {
+    var dropdownContent = this.querySelector('.dropdown-menu');
+    dropdownContent.style.display = 'block';  // Show the dropdown
+});
+
+document.querySelector('.nav-item.dropdown').addEventListener('mouseleave', function() {
+    var dropdownContent = this.querySelector('.dropdown-menu');
+    dropdownContent.style.display = 'none';  // Hide the dropdown
+});
+
+
     function autoSearch() {
     const urlParams = new URLSearchParams(window.location.search);
     const category = urlParams.get('category');

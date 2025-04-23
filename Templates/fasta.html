@@ -1,0 +1,128 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDMVS Analyzer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #9eecde;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            margin-bottom: 2%;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #003366;
+            color: white;
+        }
+        h1 {
+            font-size: 2.5rem;
+        }
+        .description {
+            margin-top: 20px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .description h2 {
+            font-size: 1.8rem;
+            color: #003366;
+        }
+        .description p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .form-container {
+            margin-top: 30px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h3 {
+            font-size: 1.6rem;
+            color: #003366;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-size: 1.1rem;
+            color: #333;
+        }
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        .submit-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+        textarea {
+            width: 98%;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>BDMVS ANALYZER</h1>
+        </header>
+
+        <!-- Description Section -->
+        <div class="description">
+            <h2>About BDMVS</h2>
+            <p style="display: flex; justify-content: center;">BDMVS Analyzer is an integrated bioinformatics tool designed to simplify and streamline the analysis of biological sequences. Whether you're working with DNA, RNA, or protein sequences, BDMVS offers a robust platform to perform key molecular operations such as reverse complementation, transcription, translation, and protein property analysis. It leverages the power of Biopython to deliver accurate calculations for molecular weight, isoelectric point, amino acid composition, instability index, and hydropathicity (GRAVY). With an intuitive interface and powerful backend, BDMVS helps researchers, students, and bioinformaticians explore biological data with ease and efficiency.</p>    
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-container">
+            <h3>Select Sequence Type</h3>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>Choose the sequence type:</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="sequenceType" value="protein" required> Protein</label>
+                        <label><input type="radio" name="sequenceType" value="dna" required> DNA/RNA</label>
+                    </div>
+                </div>
+            
+                <div class="form-group" style="margin-top: 4%;">
+                    <label for="sequence" style="margin-bottom: 5px;">Enter your FASTA sequence:</label>
+                    <textarea name="sequence" rows="8" style="margin-top: 1%;" placeholder="Enter sequence here..." required></textarea>
+                    <button type="submit" class="submit-btn" style="margin-top: 1%;">Submit</button>
+                </div>
+            </form>            
+        </div>
+    </div>
+</body>
+</html>
