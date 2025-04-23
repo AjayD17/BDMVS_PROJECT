@@ -828,7 +828,7 @@ from django.core.files.storage import FileSystemStorage
 
 from django.shortcuts import render, redirect
 from .models import Book, BookFile
-
+"""
 def upload_files(request):
     # Define categories
     category_choices = [
@@ -866,7 +866,56 @@ def upload_files(request):
         "category_choices": category_choices,
     })
 
+"""
+UPLOAD_DIR = r"E:\BDMVS\Books"
 
+def upload_files(request):
+    # Define categories
+    category_choices = [
+        ('Protein', 'Protein'),
+        ('Genome', 'Genome'),
+        ('Nucleotide', 'Nucleotide'),
+        ('Taxonomy', 'Taxonomy'),
+        ('PubChem', 'PubChem'),
+        ('BLAST', 'BLAST'),
+    ]
+
+    if request.method == "POST":
+        category = request.POST.get("category")
+        files = request.FILES.getlist("files")
+
+        # Ensure a valid category is selected
+        if category not in dict(category_choices):
+            messages.error(request, "Invalid category selected.")
+            return redirect("upload_files")
+
+        # Ensure files are uploaded
+        if not files:
+            messages.error(request, "No files were uploaded. Please select files.")
+            return redirect("upload_files")
+
+        # Get the first book in the category or create a new one
+        book = Book.objects.filter(category=category).first()
+        if not book:
+            book = Book.objects.create(category=category, title=f"Default {category} Book")
+
+        # Ensure the main books directory exists
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+        # Save uploaded files to 'E:\BDMVS\Books'
+        for file in files:
+            file_path = os.path.join(UPLOAD_DIR, file.name)
+            with open(file_path, "wb+") as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+            BookFile.objects.create(book=book, file=file)
+
+        messages.success(request, f"Successfully uploaded {len(files)} file(s).")
+        return redirect("upload_files")
+
+    return render(request, "uploads.html", {
+        "category_choices": category_choices,
+    })
 
 # def upload_files(request):
 #     if request.method == 'POST' and request.FILES.getlist('files'):
@@ -928,12 +977,21 @@ def upload_files(request):
 #     return render(request, 'books.html', {'books': books, 'category': category})
 
 # Directory Setup
+import os
+import json
+import fitz  # PyMuPDF for PDF handling
+import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
+from django.conf import settings
+from django.shortcuts import render, redirect
+from django.http import JsonResponse, StreamingHttpResponse, FileResponse
+# Directories
 PDF_DIR = os.path.join(settings.BASE_DIR, 'Books')
 COVERS_DIR = os.path.join(settings.BASE_DIR, 'static/covers')
 os.makedirs(PDF_DIR, exist_ok=True)
 os.makedirs(COVERS_DIR, exist_ok=True)
 
-# API keys
+# API Keys
 YOUTUBE_API_KEY = "AIzaSyAlk5VLBoiCD3TqxLS9HtMlyQZMgueX2NE"
 GOOGLE_API_KEY = "AIzaSyCCLzb24E4fuJLwdeq94Zu9JPSkiozifso"
 CUSTOM_SEARCH_ENGINE_ID = "c56f8f041442444b7"
@@ -942,14 +1000,14 @@ CUSTOM_SEARCH_ENGINE_ID = "c56f8f041442444b7"
 def home(request):
     return render(request, 'home.html')
 
-# Immediate redirection after form submission
+# Search Redirection
 def search(request):
     search_word = request.GET.get('search_word', '').strip()
     if not search_word:
         return redirect('home')
     return redirect(f'/results/?search_word={search_word}')
 
-# Results view
+# Results View
 def results(request):
     search_word = request.GET.get('search_word', '').strip()
     return render(request, 'results.html', {'query': search_word})
@@ -961,9 +1019,6 @@ def search_pdf(request):
     def result_stream():
         book_found = False
         for result in search_pdfs(search_word):
-            if "no_books_found" in result:
-                yield f"data: {json.dumps(result)}\n\n"
-                break
             yield f"data: {json.dumps(result)}\n\n"
             book_found = True
         
@@ -984,50 +1039,55 @@ def search_youtube(request):
     youtube_results = fetch_youtube_results(search_word)
     return JsonResponse({"youtube_results": youtube_results})
 
-# Optimized PDF Search Logic
+# PDF Search Logic
 def search_pdfs(search_word):  
-    pdf_files = [f for f in os.listdir(PDF_DIR) if f.endswith(".pdf")][:100]
+    pdf_files = [f for f in os.listdir(PDF_DIR) if f.endswith(".pdf")]
+    print(f"🔎 Total PDFs found: {len(pdf_files)}")
+
+    displayed_books = set()
 
     # Title Matching for Faster Results
     for file in pdf_files:
-        if search_word.lower() in file.lower():  
-            yield {
-                "book_name": file.replace(".pdf", ""),
-                "book_cover": f"/static/covers/{file.replace('.pdf', '.png')}",
-                "download_link": f"/download/{file}"
-            }
-            return  # Exit early once a title match is found
+        if search_word.lower() in file.lower():
+            print(f"✅ Title match found: {file}")
+            book_name = file.replace(".pdf", "")
+            if book_name not in displayed_books:
+                displayed_books.add(book_name)
+                yield {
+                    "book_name": book_name,
+                    "book_cover": f"/static/covers/{file.replace('.pdf', '.png')}",
+                    "download_link": f"/download/{file}"
+                }
 
+    # PDF Content Search
     def search_file(file):
+        print(f"📖 Searching content in: {file}")
         pdf_path = os.path.join(PDF_DIR, file)
         occurrences, cover_image = search_word_in_pdf(pdf_path, search_word)
         if occurrences > 0:
-            return {
-                "book_name": file.replace(".pdf", ""),
-                "book_cover": cover_image if cover_image else "/static/default_cover.jpg",
-                "download_link": f"/download/{file}"
-            }
+            print(f"✅ Keyword found in: {file}")
+            book_name = file.replace(".pdf", "")
+            if book_name not in displayed_books:
+                displayed_books.add(book_name)
+                return {
+                    "book_name": book_name,
+                    "book_cover": cover_image if cover_image else "/static/default_cover.jpg",
+                    "download_link": f"/download/{file}"
+                }
         return None
 
+    # Using ThreadPoolExecutor for parallel processing without timeout
     with ThreadPoolExecutor(max_workers=10) as executor:
-        futures = {executor.submit(search_file, file): file for file in pdf_files}
+        futures = [executor.submit(search_file, file) for file in pdf_files]
 
-        book_found = False
         for future in as_completed(futures):
-            if book_found:
-                break  # Stop further checks once a book is found
+            result = future.result()
+            if result:
+                yield result
 
-            try:
-                result = future.result(timeout=3)  # Timeout for faster detection
-                if result:
-                    book_found = True
-                    yield result  # Send result immediately
-            except TimeoutError:
-                print(f"Timeout error on file: {futures[future]}")
-                continue
-
-        if not book_found:
-            yield {"no_books_found": True}
+    # Display 'No books found' only if no matches occur
+    if not displayed_books:
+        yield {"no_books_found": True}
 
 # PDF Search with Cover Extraction
 def search_word_in_pdf(pdf_path, search_word):
@@ -1041,7 +1101,7 @@ def search_word_in_pdf(pdf_path, search_word):
                 pix = first_page.get_pixmap(matrix=fitz.Matrix(2, 2))
                 pix.save(cover_image_path)
         except Exception as e:
-            print(f"Error extracting cover for {pdf_path}: {e}")
+            print(f"❗ Error extracting cover for {pdf_path}: {e}")
             cover_image_path = "/static/default_cover.jpg"
 
     try:
@@ -1050,10 +1110,10 @@ def search_word_in_pdf(pdf_path, search_word):
                 text = page.get_text()
                 if search_word.lower() in text.lower():
                     occurrences += text.lower().count(search_word.lower())
-                    if occurrences > 0:
-                        break
+                    print(f"✅ Found '{search_word}' {occurrences} time(s) in {pdf_path}")
+                    break
     except Exception as e:
-        print(f"Error reading PDF {pdf_path}: {e}")
+        print(f"❗ Error reading PDF {pdf_path}: {e}")
 
     return occurrences, cover_image_path
 
@@ -1108,11 +1168,12 @@ def download(request, book_name):
         return JsonResponse({"error": "File not found."}, status=404)
     return FileResponse(open(pdf_path, 'rb'), as_attachment=True)
 
-# Results view
+# Results View
 def search_results(request):
     query = request.GET.get('search_word', '')
     context = {'query': query}
     return render(request, 'results.html', context)
+    # return render(request, 'results.html', context)
 
 # Results view
 def search(request):
