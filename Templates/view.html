@@ -1,35 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
+    <meta charset="UTF-8">
     <title>Protein Structure Viewer</title>
-    <script src="https://cdn.jsdelivr.net/npm/ngl@2.0.0-dev.39/dist/ngl.js"></script>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-q4Q0X1uhKxH+WY8U8nKX0oLNUa9bmgI4Z59cUVGkK3U5FEAK2Va4zJcHXQK1rNfD" crossorigin="anonymous">
 
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-VGPsn5uHzoB+lKPJNUWFM1oK8GejqekYK2pFwDw5gj9e/tnm6ZG2d6sOwZb5zXkz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/ngl@2.0.0-dev.39/dist/ngl.js"></script>
 
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #3aaeae; /* black background */
-            color: #fff;
-            padding: 20px;
+            background: linear-gradient(to right, #8be9d8, #70c1b3);
+            padding-bottom: 5vh;
+            color: white;
         }
 
         h2, h3 {
             text-align: center;
+            margin-top: 4vh;
         }
 
         form {
             text-align: center;
-            margin-bottom: 20px;
+            margin: 15px auto;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border-radius: 5px;
+            border: 2px solid black;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
         }
 
         .viewer-container {
             display: flex;
             justify-content: space-between;
             gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         #viewport {
@@ -37,100 +58,110 @@
             height: 300px;
             background-color: #222;
             border-radius: 8px;
-            cursor: move;
         }
 
         .info-box {
             flex: 1;
-            padding: 20px;
             background-color: white;
             color: black;
             border-radius: 8px;
+            padding: 20px;
+            display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left; /* Centers the content horizontally */
+    flex: 1;
+    background-color: white;
+    color: black;
+    border-radius: 8px;
+    padding: 20px;
+    height: 100%; /* Make sure it takes the full height */
         }
 
         .info-box p {
             margin: 10px 0;
         }
 
-        .error {
-            color: red;
-        }
-
-        input[type="text"] {
-            padding: 8px;
-            width: 250px;
-        }
-
-        button {
-            padding: 8px 16px;
-            margin-left: 10px;
-        }
-
-        /* Style for empty results */
-        .no-results {
+        .login-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 10vh auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             text-align: center;
-            color: #ff6347; /* Red */
         }
 
-        .info-box {
-    background-color: white;
-    color: black;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
+        .login-container p {
+            color: red;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
 
+        .login-container a {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-container a:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <h2>BDMVS Structure Viewer</h2>
 
-    <form method="get">
-        <input type="text" name="pdb_id" placeholder="Enter PDB ID (e.g., 1crn)" required>
-        <button type="submit">View Structure</button>
-    </form>
+    {% include "navbar.html" %}
 
-    {% if pdb_id %}
-        <h3>Protein Structure (PDB ID: {{ pdb_id }})</h3>
+    {% if user.is_authenticated %}
+        <h2 style="font-weight:bold; margin-top:3vh;">BDMVS Structure Viewer</h2>
 
-        <div class="viewer-container">
-            <div id="viewport"></div>
+        <form method="get">
+            <input type="text" name="pdb_id" placeholder="Enter PDB ID (e.g., 1crn)" value="{{ pdb_id|default_if_none:'' }}" required>
+            <button type="submit">View Structure</button>
+        </form>
 
-            <div class="info-box d-flex flex-column justify-content-center">
-                {% if protein_info.error %}
-                    <p class="error">{{ protein_info.error }}</p>
-                {% else %}
-                    <p><strong>Title:</strong> {{ protein_info.title }}</p>
-                    <p><strong>Method:</strong> {{ protein_info.method }}</p>
-                    <p><strong>Resolution:</strong> {{ protein_info.resolution }} Å</p>
-                    <p><strong>Deposition Date:</strong> {{ protein_info.deposition_date }}</p>
-                    <p><strong>Release Date:</strong> {{ protein_info.release_date }}</p>
-                    <p><strong>Authors:</strong> {{ protein_info.authors }}</p>
-                {% endif %}
+        {% if pdb_id %}
+            <h3 style="margin-bottom:3vh;">Protein Structure (PDB ID: {{ pdb_id }})</h3>
+
+            <div class="viewer-container">
+                <div id="viewport"></div>
+
+                <div class="info-box">
+                    {% if protein_info.error %}
+                        <p class="text-danger"><strong>{{ protein_info.error }}</strong></p>
+                    {% else %}
+                        <p><strong>Title:</strong> {{ protein_info.title }}</p>
+                        <p><strong>Method:</strong> {{ protein_info.method }}</p>
+                        <p><strong>Resolution:</strong> {{ protein_info.resolution }} Å</p>
+                        <p><strong>Deposition Date:</strong> {{ protein_info.deposition_date }}</p>
+                        <p><strong>Release Date:</strong> {{ protein_info.release_date }}</p>
+                        <p><strong>Authors:</strong> {{ protein_info.authors }}</p>
+                    {% endif %}
+                </div>
             </div>
-        </div>
 
-        <script>
-            const stage = new NGL.Stage("viewport");
-
-            stage.loadFile("https://files.rcsb.org/download/{{ pdb_id }}.pdb", {
-                defaultRepresentation: true
-            }).then(function(component) {
-                component.autoView();
-            });
-
-            // Enable zooming and mouse controls
-            const viewport = document.getElementById("viewport");
-            stage.handleResize();  // Handle resizing of the viewport
-
-            // Set up zoom controls (using the NGL viewer's default controls)
-            stage.mouseControls = NGL.MOUSE.CONTROLS_ALL;
-        </script>
+            <script>
+                const stage = new NGL.Stage("viewport");
+                stage.loadFile("https://files.rcsb.org/download/{{ pdb_id }}.pdb", {
+                    defaultRepresentation: true
+                }).then(function(component) {
+                    component.autoView();
+                });
+                stage.handleResize();
+                stage.mouseControls = NGL.MouseControls;
+            </script>
+        {% endif %}
+    
     {% else %}
-        <div class="no-results">
-            <h4 style="color:black">Please enter a PDB ID to view the protein structure.</h4>
+        <div class="login-container">
+            <p>Please log in to see the protein structure viewer.</p>
+            <a href="{% url 'signup' %}">Login</a>
         </div>
     {% endif %}
+
 </body>
 </html>

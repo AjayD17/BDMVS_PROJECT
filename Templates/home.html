@@ -1108,6 +1108,7 @@ button:hover {
   margin: 4px 16px;
 }
 
+
   </style>
   <body>
     <nav class="navbar navbar-expand-lg pt-4 pb-4">
@@ -1133,11 +1134,6 @@ button:hover {
   <!-- ABOUT -->
   <li class="nav-item position-relative dropdown-hover text-center">
     <a class="nav-link" href="#about-us" style="padding: 10px 20px;">About</a>
-    <div class="about-dropdown text-center">
-      <p class="text-white px-3">
-        The Biological Development Management & Visualization System (BDMVS) is an advanced platform designed to manage, analyze, and visualize biological data efficiently. It enables researchers to search, retrieve, and explore protein-related information from extensive biological databases, providing valuable insights into molecular structures and interactions. The system incorporates interactive visualization tools, allowing users to examine complex protein structures in detail.
-      </p>
-    </div>
   </li>
 
   <!-- POPULAR RESOURCES -->
@@ -1186,11 +1182,37 @@ button:hover {
       <li><a class="dropdown-item text-white" href="{% url 'bdmvs-fasta' %}">BDMVS Analyzer</a></li>
     </ul>
   </li>
-
+  
             <!-- Login Button -->
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'signup' %}" style="padding: 10px 20px; background-color: #5c6bc0; color: white; border-radius: 5px;">Login</a>
-            </li>
+            {% if user.is_authenticated %}
+  <!-- Profile Dropdown -->
+  <!-- Profile Dropdown -->
+<li class="nav-item position-relative dropdown-hover text-center">
+  <a class="nav-link dropdown-toggle d-flex align-items-center justify-content-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    {% if user.profile.profile_picture %}
+      <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; cursor: pointer;">
+    {% else %}
+      <div id="profileImagePlaceholder" class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; font-weight: bold;">
+        {{ user.username|first|upper }}
+      </div>
+    {% endif %}
+  </a>
+  <ul class="dropdown-menu dropdown-menu-end profile-dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: black;">
+    <li><a class="dropdown-item text-white" href="{% url 'profile' %}">Profile</a></li>
+    <li><hr class="dropdown-divider bg-light"></li>
+    <li><a class="dropdown-item text-white" href="{% url 'settings' %}">Settings</a></li>
+    <li><hr class="dropdown-divider bg-light"></li>
+    <li><a class="dropdown-item text-white" href="{% url 'logout' %}">Logout</a></li>
+  </ul>
+</li>
+
+{% else %}
+  <!-- Login Button -->
+  <li class="nav-item {% if request.path == '/login/' %}active{% endif %}">
+    <a class="nav-link" href="{% url 'signin' %}" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">Login</a>
+  </li>
+{% endif %}
+
           </ul>
         </div>
       </div>
@@ -1369,11 +1391,9 @@ button:hover {
                   <button type="button">Download</button>
               </a>
             </div>            
-
-  
           </div>
       </div>
-    </section>  
+    </section>
 
     <section id="questions" style="background-color: #e1f0da; padding-bottom:5vh; padding-left:3vh; padding-right: 3vh;">
       <div class="container">

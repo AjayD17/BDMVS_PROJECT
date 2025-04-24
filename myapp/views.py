@@ -1313,7 +1313,7 @@ def search_protein(request):
 
 def fetch_protein_from_uniprot(query):
     """Fetch protein data from UniProt API with more detailed fields."""
-    url = f"https://rest.uniprot.org/uniprotkb/search?query={query}&format=json&size=10"
+    url = f"https://rest.uniprot.org/uniprotkb/search?query={query}&format=json&size=100"
     response = requests.get(url)
 
     if response.status_code == 200:

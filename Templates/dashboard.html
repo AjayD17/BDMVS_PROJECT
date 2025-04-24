@@ -13,8 +13,10 @@
 
     <style>
         body {
-            background: #b4e2da;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #8be9d8, #70c1b3);
+            padding-bottom: 5vh;
+            color: white;
         }
         .search-bar, .chart-box, .card-custom {
             background: #fff;
@@ -40,236 +42,268 @@
             max-height: 100% !important;
             max-width: 100% !important;
         }
+    
+        /* Add styling for the login container */
+        .login-container {
+            background-color: #f4f4f4;  /* Change to desired background color */
+            padding: 40px 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .login-container p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        .login-container a {
+            font-size: 1rem;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .login-container a:hover {
+            text-decoration: underline;
+        }
     </style>
+    
 </head>
 <body>
-<div class="container">
-    <!-- Logo -->
-    <div class="container mt-4 mb-3">
-        <div class="row align-items-center justify-content-center text-center">
-            <div class="col-auto">
-                <img src="{% static 'images/logo.png' %}" alt="Logo" class="img-fluid" style="max-width: 100px;">
-            </div>
-            <div class="col-auto">
-                <h2><b>BDMVS Dashboard</b></h2>
-            </div>
-        </div>
-    </div>
+    <!-- Include Navbar from view.html -->
+    {% include "navbar.html" %}
 
-    <!-- Category and Subcategory Selector -->
-    <div class="search-bar text-center">
-        <form method="get">
-            <div class="row justify-content-center g-2">
-                <div class="col-md-4">
-                    <select name="category" class="form-select" onchange="this.form.submit()">
-                        <option value="">-- Select Category --</option>
-                        {% for cat in categories %}
-                            <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>
-                                {{ cat|title }}
-                            </option>
-                        {% endfor %}
-                    </select>
+    <!-- User Authentication Check -->
+    {% if user.is_authenticated %}
+        <div class="container">
+            <!-- Logo -->
+            <div class="container mt-4 mb-3">
+                <div class="row align-items-center justify-content-center text-center">
+                    <div class="col-auto">
+                        <h2><b>BDMVS Dashboard</b></h2>
+                    </div>
                 </div>
+            </div>
 
-                {% if subcategories %}
-                    <div class="col-md-4">
-                        <select name="subcategory" class="form-select" onchange="this.form.submit()">
-                            <option value="">-- All {{ selected_category|title }} Types --</option>
-                            {% for sub in subcategories %}
-                                {% if sub %}
-                                    <option value="{{ sub }}" {% if sub == selected_subcategory %}selected{% endif %}>
-                                        {{ sub }}
+            <!-- Category and Subcategory Selector -->
+            <div class="search-bar text-center">
+                <form method="get">
+                    <div class="row justify-content-center g-2">
+                        <div class="col-md-4">
+                            <select name="category" class="form-select" onchange="this.form.submit()">
+                                <option value="">-- Select Category --</option>
+                                {% for cat in categories %}
+                                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>
+                                        {{ cat|title }}
                                     </option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        {% if subcategories %}
+                            <div class="col-md-4">
+                                <select name="subcategory" class="form-select" onchange="this.form.submit()">
+                                    <option value="">-- All {{ selected_category|title }} Types --</option>
+                                    {% for sub in subcategories %}
+                                        {% if sub %}
+                                            <option value="{{ sub }}" {% if sub == selected_subcategory %}selected{% endif %}>
+                                                {{ sub }}
+                                            </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
+                </form>
             </div>
-        </form>
-    </div>
 
-    <!-- Category Cards -->
-    <div class="row justify-content-center">
-        {% for name, range in categories.items %}
-            <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex">
-                <a href="{% url 'show_data' name %}" class="w-100 text-decoration-none text-dark">
-                    <div class="card-custom w-100">
-                        <h5 class="mb-2">{{ name|title }}</h5>
-                        <p>Count: 
-                            {% if name == selected_category %}
-                                {{ category_totals|dict_get:name }}
-                            {% else %}
-                                0
-                            {% endif %}
-                        </p>                        
-                        <button class="btn btn-sm btn-outline-primary">View</button>
+            <!-- Category Cards -->
+            <div class="row justify-content-center">
+                {% for name, range in categories.items %}
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 mb-4 d-flex">
+                        <a href="{% url 'show_data' name %}" class="w-100 text-decoration-none text-dark">
+                            <div class="card-custom w-100">
+                                <h5 class="mb-2">{{ name|title }}</h5>
+                                <p>Count: 
+                                    {% if name == selected_category %}
+                                        {{ category_totals|dict_get:name }}
+                                    {% else %}
+                                        0
+                                    {% endif %}
+                                </p>                        
+                                <button class="btn btn-sm btn-outline-primary">View</button>
+                            </div>
+                        </a>
                     </div>
-                </a>
+                {% endfor %}
             </div>
-        {% endfor %}
-    </div>
 
-    <!-- Charts Section -->
-    {% if selected_category and chart_data_all and chart_data_all|length > 0 %}
-    <div class="row justify-content-center">
-        <!-- Bar Chart -->
-        <div class="col-md-6">
-            <div class="chart-box">
-                <h5>{{ selected_category|title }} - Bar Chart (All)</h5>
-                <div class="chart-container">
-                    <canvas id="barChart"></canvas>
+            <!-- Charts Section -->
+            {% if selected_category and chart_data_all and chart_data_all|length > 0 %}
+            <div class="row justify-content-center">
+                <!-- Bar Chart -->
+                <div class="col-md-6">
+                    <div class="chart-box">
+                        <h5>{{ selected_category|title }} - Bar Chart (All)</h5>
+                        <div class="chart-container">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Line Chart -->
+                <div class="col-md-6">
+                    <div class="chart-box">
+                        <h5>{{ selected_category|title }} - Line Chart (All)</h5>
+                        <div class="chart-container">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pie Chart -->
+                <div class="col-md-6">
+                    <div class="chart-box">
+                        <h5>{{ selected_category|title }} - Pie Chart (Top 5)</h5>
+                        <div class="chart-container">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Doughnut Chart -->
+                <div class="col-md-6">
+                    <div class="chart-box">
+                        <h5>{{ selected_category|title }} - Doughnut Chart (Top 5)</h5>
+                        <div class="chart-container">
+                            <canvas id="doughnutChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
+            {% endif %}
         </div>
-
-        <!-- Line Chart -->
-        <div class="col-md-6">
-            <div class="chart-box">
-                <h5>{{ selected_category|title }} - Line Chart (All)</h5>
-                <div class="chart-container">
-                    <canvas id="lineChart"></canvas>
-                </div>
-            </div>
+    {% else %}
+        <!-- Login Container -->
+        <div class="login-container">
+            <p>Please log in to access the dashboard.</p>
+            <a href="{% url 'signup' %}">Login</a>
         </div>
-
-        <!-- Pie Chart -->
-        <div class="col-md-6">
-            <div class="chart-box">
-                <h5>{{ selected_category|title }} - Pie Chart (Top 5)</h5>
-                <div class="chart-container">
-                    <canvas id="pieChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Doughnut Chart -->
-        <div class="col-md-6">
-            <div class="chart-box">
-                <h5>{{ selected_category|title }} - Doughnut Chart (Top 5)</h5>
-                <div class="chart-container">
-                    <canvas id="doughnutChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
     {% endif %}
-</div>
 
-<!-- Chart Scripts -->
-<script>
-    const chartDataAll = JSON.parse('{{ chart_data_all|escapejs }}');
-    const chartDataTop5 = JSON.parse('{{ chart_data_top5|escapejs }}');
-    const bgColors = ['#00aaff', '#ffaa00', '#88cc00', '#ff5577', '#aa00ff', '#FF8C00', '#8A2BE2', '#3CB371', '#DC143C', '#1E90FF'];
+    <!-- Chart Scripts -->
+    <script>
+        const chartDataAll = JSON.parse('{{ chart_data_all|escapejs }}');
+        const chartDataTop5 = JSON.parse('{{ chart_data_top5|escapejs }}');
+        const bgColors = ['#00aaff', '#ffaa00', '#88cc00', '#ff5577', '#aa00ff', '#FF8C00', '#8A2BE2', '#3CB371', '#DC143C', '#1E90FF'];
 
-    function renderCharts() {
-        if (!chartDataAll.labels || chartDataAll.labels.length === 0) return;
+        function renderCharts() {
+            if (!chartDataAll.labels || chartDataAll.labels.length === 0) return;
 
-        const commonOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return `${context.label}: ${context.parsed.y ?? context.parsed}`;
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return `${context.label}: ${context.parsed.y ?? context.parsed}`;
+                            }
+                        }
+                    },
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            font: { size: 12 },
+                            autoSkip: false,
+                            maxRotation: 45,
+                            minRotation: 30
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            font: { size: 12 }
+                        },
+                        beginAtZero: true
+                    }
+                }
+            };
+
+            new Chart(document.getElementById('barChart'), {
+                type: 'bar',
+                data: {
+                    labels: chartDataAll.labels,
+                    datasets: [{
+                        label: 'Values',
+                        data: chartDataAll.values,
+                        backgroundColor: bgColors,
+                        borderRadius: 5
+                    }]
+                },
+                options: commonOptions
+            });
+
+            new Chart(document.getElementById('lineChart'), {
+                type: 'line',
+                data: {
+                    labels: chartDataAll.labels,
+                    datasets: [{
+                        label: 'Values',
+                        data: chartDataAll.values,
+                        borderColor: '#3399ff',
+                        backgroundColor: 'rgba(51, 153, 255, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: commonOptions
+            });
+
+            const pieOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    outlabels: {
+                        text: '%l (%v)',
+                        color: 'black',
+                        stretch: 25,
+                        font: {
+                            resizable: true,
+                            minSize: 12,
+                            maxSize: 18
                         }
                     }
-                },
-                legend: { display: false }
-            },
-            scales: {
-                x: {
-                    ticks: {
-                        font: { size: 12 },
-                        autoSkip: false,
-                        maxRotation: 45,
-                        minRotation: 30
-                    }
-                },
-                y: {
-                    ticks: {
-                        font: { size: 12 }
-                    },
-                    beginAtZero: true
                 }
-            }
-        };
+            };
 
-        new Chart(document.getElementById('barChart'), {
-            type: 'bar',
-            data: {
-                labels: chartDataAll.labels,
-                datasets: [{
-                    label: 'Values',
-                    data: chartDataAll.values,
-                    backgroundColor: bgColors,
-                    borderRadius: 5
-                }]
-            },
-            options: commonOptions
-        });
+            new Chart(document.getElementById('pieChart'), {
+                type: 'pie',
+                data: {
+                    labels: chartDataTop5.labels,
+                    datasets: [{
+                        data: chartDataTop5.values,
+                        backgroundColor: bgColors
+                    }]
+                },
+                options: pieOptions
+            });
 
-        new Chart(document.getElementById('lineChart'), {
-            type: 'line',
-            data: {
-                labels: chartDataAll.labels,
-                datasets: [{
-                    label: 'Values',
-                    data: chartDataAll.values,
-                    borderColor: '#3399ff',
-                    backgroundColor: 'rgba(51, 153, 255, 0.2)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: commonOptions
-        });
+            new Chart(document.getElementById('doughnutChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: chartDataTop5.labels,
+                    datasets: [{
+                        data: chartDataTop5.values,
+                        backgroundColor: bgColors
+                    }]
+                },
+                options: pieOptions
+            });
+        }
 
-        const pieOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                outlabels: {
-                    text: '%l (%v)',
-                    color: 'black',
-                    stretch: 25,
-                    font: {
-                        resizable: true,
-                        minSize: 12,
-                        maxSize: 18
-                    }
-                }
-            }
-        };
-
-        new Chart(document.getElementById('pieChart'), {
-            type: 'pie',
-            data: {
-                labels: chartDataTop5.labels,
-                datasets: [{
-                    data: chartDataTop5.values,
-                    backgroundColor: bgColors
-                }]
-            },
-            options: pieOptions
-        });
-
-        new Chart(document.getElementById('doughnutChart'), {
-            type: 'doughnut',
-            data: {
-                labels: chartDataTop5.labels,
-                datasets: [{
-                    data: chartDataTop5.values,
-                    backgroundColor: bgColors
-                }]
-            },
-            options: pieOptions
-        });
-    }
-
-    window.onload = renderCharts;
-</script>
+        window.onload = renderCharts;
+    </script>
 
 </body>
 </html>

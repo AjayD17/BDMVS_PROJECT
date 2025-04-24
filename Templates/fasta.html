@@ -1,4 +1,4 @@
-{% load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,12 +7,13 @@
     <title>BDMVS Analyzer</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #9eecde;
-            color: #333;
             margin: 0;
             padding: 0;
             margin-bottom: 2%;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #8be9d8, #70c1b3);
+            padding-bottom: 5vh;
+            color: white;
         }
         .container {
             width: 80%;
@@ -86,9 +87,38 @@
             border: 1px solid #ccc;
             resize: vertical;
         }
+        .login-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 10vh auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        .login-container p {
+            color: red;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .login-container a {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .login-container a:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
+
+    {% include "navbar.html" %}
+
+    {% if user.is_authenticated %}
     <div class="container">
         <!-- Header -->
         <header>
@@ -98,12 +128,14 @@
         <!-- Description Section -->
         <div class="description">
             <h2>About BDMVS</h2>
-            <p style="display: flex; justify-content: center;">BDMVS Analyzer is an integrated bioinformatics tool designed to simplify and streamline the analysis of biological sequences. Whether you're working with DNA, RNA, or protein sequences, BDMVS offers a robust platform to perform key molecular operations such as reverse complementation, transcription, translation, and protein property analysis. It leverages the power of Biopython to deliver accurate calculations for molecular weight, isoelectric point, amino acid composition, instability index, and hydropathicity (GRAVY). With an intuitive interface and powerful backend, BDMVS helps researchers, students, and bioinformaticians explore biological data with ease and efficiency.</p>    
+            <p style="display: flex; justify-content: center;">
+                BDMVS Analyzer is an integrated bioinformatics tool designed to simplify and streamline the analysis of biological sequences. Whether you're working with DNA, RNA, or protein sequences, BDMVS offers a robust platform to perform key molecular operations such as reverse complementation, transcription, translation, and protein property analysis. It leverages the power of Biopython to deliver accurate calculations for molecular weight, isoelectric point, amino acid composition, instability index, and hydropathicity (GRAVY). With an intuitive interface and powerful backend, BDMVS helps researchers, students, and bioinformaticians explore biological data with ease and efficiency.
+            </p>    
         </div>
 
         <!-- Form Section -->
         <div class="form-container">
-            <h3>Select Sequence Type</h3>
+            <h3 style="margin-bottom: 3vh;">Select Sequence Type</h3>
 
             <form method="POST">
                 {% csrf_token %}
@@ -116,13 +148,20 @@
                     </div>
                 </div>
             
-                <div class="form-group" style="margin-top: 4%;">
+                <div class="form-group" style="margin-top: 3%;">
                     <label for="sequence" style="margin-bottom: 5px;">Enter your FASTA sequence:</label>
-                    <textarea name="sequence" rows="8" style="margin-top: 1%;" placeholder="Enter sequence here..." required></textarea>
+                    <textarea name="sequence" rows="6" style="margin-top: 1%;" placeholder="Enter sequence here..." required></textarea>
                     <button type="submit" class="submit-btn" style="margin-top: 1%;">Submit</button>
                 </div>
             </form>            
         </div>
     </div>
+    {% else %}
+    <div class="login-container">
+        <p>Please log in to access the BDMVS Analyzer.</p>
+        <a href="{% url 'signup' %}">Login</a>
+    </div>
+    {% endif %}
+
 </body>
 </html>
