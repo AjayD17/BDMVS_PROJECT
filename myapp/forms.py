@@ -15,6 +15,12 @@ class AlbuminForm(forms.ModelForm):
             'sub_content': forms.Textarea(attrs={'rows': 3, 'cols': 20}),
         }
 
+# Profile Form
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['profile_picture']
+
 # Custom User Registration Form
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
