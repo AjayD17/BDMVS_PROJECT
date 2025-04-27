@@ -121,98 +121,57 @@
 </head>
 <body style="margin-bottom:5vh">
     {% include "navbar.html" %}
-    
-    <h2 style="margin-top: 4vh; color:white; text-shadow: 2px 2px 3px black;">
-        {% if request.GET.q %}
-            Search Results for "{{ request.GET.q }}"
-        {% else %}
-            Books on {{ category }}
-        {% endif %}
-    </h2>      
 
-    <!-- Search Box -->
-    <form id="searchForm" method="GET" action="" style="margin-top:3vh">
-        <input type="text" id="search_word" name="q" placeholder="Search for books..." value="{{ request.GET.q }}" style="border:2px solid black;">
-        <button type="submit" style="border:1px solid white; color:white; border-radius:1vh;">Search</button>
-    </form>
+    {% if user.is_authenticated %}
+        <h2 style="margin-top: 4vh; color:white; text-shadow: 2px 2px 3px black;">
+            {% if request.GET.q %}
+                Search Results for "{{ request.GET.q }}"
+            {% else %}
+                Books on {{ category }}
+            {% endif %}
+        </h2>
 
-    <div id="loading">Loading...</div>
+        <!-- Search Box -->
+        <form id="searchForm" method="GET" action="" style="margin-top:3vh">
+            <input type="text" id="search_word" name="q" placeholder="Search for books..." value="{{ request.GET.q }}" style="border:2px solid black;">
+            <button type="submit" style="border:1px solid white; color:white; border-radius:1vh;">Search</button>
+        </form>
 
-    <div class="container d-flex flex-column align-items-center">
-        {% for book in books %}
-            <div class="book-result d-flex align-items-center p-3 justify-content-center">
-                <!-- Book Cover Image (Aligned Left) -->
-                <img src="{{ book.image.url }}" alt="{{ book.title }}" class="book-cover img-fluid">
-    
-                <!-- Book Info (Aligned Right) -->
-                <div class="book-info d-flex flex-column justify-content-center px-4">
-                    <h5 class="mb-2 pb-1 pt-1">{{ book.title }}</h5>
-                    <p class="mb-2 pb-1">{{ book.description }}</p>
-    
-                    <!-- Checking if book has files -->
-                    {% if book.files.all %}
-                        {% for file in book.files.all %}
-                            <a href="{{ file.file.url }}" class="btn btn-primary btn-sm my-1" style="max-width:100px; padding:1.2vh; font-size:2.3vh;" download>Download</a>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-muted">No files available for this book.</p>
-                    {% endif %}
+        <div id="loading">Loading...</div>
+
+        <div class="container d-flex flex-column align-items-center" id="book-list">
+            {% for book in books %}
+                <div class="book-result d-flex align-items-center p-3 justify-content-center">
+                    <!-- Book Cover Image -->
+                    <img src="{{ book.image.url }}" alt="{{ book.title }}" class="book-cover img-fluid">
+
+                    <!-- Book Info -->
+                    <div class="book-info d-flex flex-column justify-content-center px-4">
+                        <h5 class="mb-2 pb-1 pt-1">{{ book.title }}</h5>
+                        <p class="mb-2 pb-1">{{ book.description }}</p>
+
+                        {% if book.files.all %}
+                            {% for file in book.files.all %}
+                                <a href="{{ file.file.url }}" class="btn btn-primary btn-sm my-1" style="max-width:100px; padding:1.2vh; font-size:2.3vh;" download>Download</a>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">No files available for this book.</p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>    
+            {% endfor %}
+        </div>
 
-    <!-- {% for book in books %}
-        <div class="book-result" style="border:2px solid black">
-            <img src="{{ book.image.url }}" alt="{{ book.title }}" class="book-cover" style="width:8%">
-            <div class="book-info">
-                <strong>{{ book.title }}</strong><br>
-                {{ book.description }} <br>
-
-                 Iterate over multiple files correctly -->
-                <!-- {% for file in book.files.all %}
-                    <button><a href="{{ file.file.url }}" download>Download</a></button><br>
-                {% endfor %}
+    {% else %}
+        <!-- Show login prompt if not authenticated -->
+        <div style="margin-top: 10vh; text-align: center;">
+            <div style="background-color: #fff; padding: 30px; padding-left:40vh; padding-right:40vh; border-radius: 10px; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                <h3 style="color: #dc3545;">Please Login to View Books</h3>
+                <p>You must be logged in to access the book search and download functionality.</p>
+                <a href="{% url 'signup' %}" class="btn btn-danger pl-4 pr-4">Login</a>
             </div>
         </div>
-    {% endfor %} --> 
-
-<script>
-    $(document).ready(function () {
-        function fetchBooks() {
-            let query = $('#search_word').val(); // Get search input
-            let category = "{{ category }}";  // Get the selected category (from Django context)
-
-            $.ajax({
-                url: "{% url 'books' %}",  // Ensure you have a named URL for 'books' in Django
-                data: { q: query, category: category },
-                dataType: 'json',
-                success: function (response) {
-                    $('#book-list').empty(); // Clear previous results
-                    if (response.books.length > 0) {
-                        response.books.forEach(book => {
-                            $('#book-list').append(`
-                                <div class="book-result d-flex align-items-center p-3 justify-content-center">
-                                    <img src="${book.image_url}" alt="Cover" class="book-cover img-fluid">
-                                    <div class="book-info d-flex flex-column justify-content-center px-3">
-                                        <h5 class="mb-2 pb-1 pt-1">${book.title}</h5>
-                                        <p class="mb-2 pb-1">${book.description}</p>
-                                        ${book.download_link ? `<a href="${book.download_link}" class="btn btn-primary btn-sm my-1" download>Download</a>` : `<p class="text-muted">No files available</p>`}
-                                    </div>
-                                </div>
-                            `);
-                        });
-                    } else {
-                        $('#book-list').html("<p>No books found.</p>");
-                    }
-                }
-            });
-        }
-
-        // Trigger search on typing
-        $('#search_word').on('input', fetchBooks);
-    });
-</script>
-
+    {% endif %}
 </body>
+
 </html>

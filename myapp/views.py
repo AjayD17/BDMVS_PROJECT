@@ -302,33 +302,36 @@ User = get_user_model()
 
 def sign_up(request):
     if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        phone_number = request.POST.get("phone_number")
-        password1 = request.POST.get("password1")
-        password2 = request.POST.get("password2")
-        profile_picture = request.FILES.get("profile_picture")
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone_number')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        profile_picture = request.FILES.get('profile_picture')  # important!
 
         if password1 != password2:
-            messages.error(request, "Passwords do not match!")
-            return redirect("signup")
+            messages.error(request, "Passwords do not match.")
+            return redirect('signup')
 
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already taken!")
-            return redirect("signup")
+        if CustomUser.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect('signup')
 
-        if User.objects.filter(email=email).exists():
-            messages.error(request, "Email is already registered!")
-            return redirect("signup")
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered.")
+            return redirect('signup')
 
-        # Create the user
-        user = User.objects.create_user(username=username, email=email, password=password1)
-        user.save()
+        user = CustomUser.objects.create_user(username=username, email=email, phone_number=phone_number, password=password1)
+        
+        # Save profile picture
+        if profile_picture:
+            user.profile.profile_picture = profile_picture
+            user.profile.save()
 
-        # Redirect to the login page with empty input fields
-        return redirect("signin")  # Make sure 'signin' is the correct URL name
+        messages.success(request, "Account created successfully! Please login.")
+        return redirect('signin')
 
-    return render(request, "signup.html")
+    return render(request, 'signup.html')
 
 def sign_in(request):
     if request.method == "POST":

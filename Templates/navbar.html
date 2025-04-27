@@ -85,8 +85,8 @@
                     </li>
                     <!-- About Link -->
                     <li class="nav-item {% if request.path == '/about/' %}active{% endif %}">
-                        <a class="nav-link" href="/#about-us" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">
-                            About
+                        <a class="nav-link" href="{% url 'home' %}" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">
+                            Back
                         </a>
                     </li>
 
@@ -96,11 +96,10 @@
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" 
                             data-bs-toggle="dropdown" aria-expanded="false">
                             {% if user.profile.profile_picture %}
-                                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" 
-                                    class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; cursor: pointer;">
+                            <img id="profileImage" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-pic">
                             {% else %}
                                 <div id="profileImagePlaceholder" class="profile-placeholder">
-                                    {{ user.username|first|upper }} <!-- Display First Letter of Username -->
+                                    {{ user.username|first|upper }}
                                 </div>
                             {% endif %}
                         </a>
@@ -116,7 +115,7 @@
                     {% else %}
                     <!-- Login Link -->
                     <li class="nav-item {% if request.path == '/login/' %}active{% endif %}">
-                        <a class="nav-link" href="{% url 'signin' %}" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">Login</a>
+                        <a class="nav-link" href="{% url 'signup' %}" style="font-size:2.8vh; margin-top: 1vh; color:white; font-weight: bold; background-color: #3A59D1; padding-left:2vh; padding-right:2vh; border-radius:1vh;">Login</a>
                     </li>
                     {% endif %}
                 </ul>

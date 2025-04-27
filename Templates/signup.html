@@ -75,7 +75,7 @@ body {
 /* Right Section (Signup) */
 .right-section {
   width: 60%;
-  padding: 20px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -100,7 +100,7 @@ body {
 }
 
 .right-section input {
-  padding: 10px;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 14px;
@@ -169,7 +169,7 @@ body {
 }
 
 </style>
-<body>
+<body style="background: linear-gradient(to right, #8be9d8, #70c1b3);">
     <div class="container">
         <!-- Left Section (Login) -->
         <div class="left-section">
@@ -206,7 +206,8 @@ body {
               <label for="password2">Confirm Password:</label>
               <input type="password" name="password2" required>
           
-              <button type="submit"><b>SIGN UP</b></button>
+              <button type="submit"><a href="{% url 'signin' %}" style="text-decoration: none; color:white; background-color:white; padding:12px 30px; border-radius:25px; color:#0fcaa7; font-weight:bold; display:inline-block;">
+                <b>SIGN UP</b></a></button>
           </form>
           
         </div>

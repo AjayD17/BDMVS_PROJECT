@@ -1185,33 +1185,33 @@ button:hover {
   
             <!-- Login Button -->
             {% if user.is_authenticated %}
-  <!-- Profile Dropdown -->
-  <!-- Profile Dropdown -->
-<li class="nav-item position-relative dropdown-hover text-center">
-  <a class="nav-link dropdown-toggle d-flex align-items-center justify-content-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    {% if user.profile.profile_picture %}
-      <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; cursor: pointer;">
-    {% else %}
-      <div id="profileImagePlaceholder" class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; font-weight: bold;">
-        {{ user.username|first|upper }}
-      </div>
-    {% endif %}
-  </a>
-  <ul class="dropdown-menu dropdown-menu-end profile-dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: black;">
-    <li><a class="dropdown-item text-white" href="{% url 'profile' %}">Profile</a></li>
-    <li><hr class="dropdown-divider bg-light"></li>
-    <li><a class="dropdown-item text-white" href="{% url 'settings' %}">Settings</a></li>
-    <li><hr class="dropdown-divider bg-light"></li>
-    <li><a class="dropdown-item text-white" href="{% url 'logout' %}">Logout</a></li>
-  </ul>
-</li>
+              <!-- Profile Dropdown -->
+            <li class="nav-item position-relative dropdown-hover text-center">
+              <a class="nav-link dropdown-toggle d-flex align-items-center justify-content-center text-white" 
+              href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: white;">
+            {% if user.profile.profile_picture %}
+                  <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; cursor: pointer;">
+                {% else %}
+                  <div id="profileImagePlaceholder" class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; font-weight: bold;">
+                    {{ user.username|first|upper }}
+                  </div>
+                {% endif %}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end profile-dropdown-menu" aria-labelledby="navbarDropdown" style="background-color: black;">
+                <li><a class="dropdown-item text-white text-center" href="{% url 'profile' %}">Profile</a></li>
+                <li><hr class="dropdown-divider bg-light"></li>
+                <li><a class="dropdown-item text-white text-center" href="{% url 'settings' %}">Settings</a></li>
+                <li><hr class="dropdown-divider bg-light"></li>
+                <li><a class="dropdown-item text-white text-center" href="{% url 'logout' %}">Logout</a></li>
+              </ul>
+            </li>
 
-{% else %}
-  <!-- Login Button -->
-  <li class="nav-item {% if request.path == '/login/' %}active{% endif %}">
-    <a class="nav-link" href="{% url 'signin' %}" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">Login</a>
-  </li>
-{% endif %}
+            {% else %}
+              <!-- Login Button -->
+              <li class="nav-item {% if request.path == '/login/' %}active{% endif %}">
+                <a class="nav-link" href="{% url 'signup' %}" style="font-size:2.8vh; margin-top: 1vh; color:white; font-weight: bold; background-color: #3A59D1; padding-left:2vh; padding-right:2vh;">Login</a>
+              </li>
+            {% endif %}
 
           </ul>
         </div>
