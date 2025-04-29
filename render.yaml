@@ -3,11 +3,12 @@ services:
     name: django-app
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn BDMVS_PROJECT.wsgi:application
+    startCommand: gunicorn Myproject.wsgi:application
     envVars:
       - key: DJANGO_SETTINGS_MODULE
-        value: BDMVS_PROJECT.settings
+        value: Myproject.settings
       - key: SECRET_KEY
         value: django-insecure-p3r^mt6$kku3(=cot$mqvjt8srh%-4xp6ws6fyxoh+&gnf+v#9
       - key: DEBUG
         value: "False"
+      # Render sets DATABASE_URL automatically, so no need to add it manually.

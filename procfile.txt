@@ -1,1 +1,1 @@
-web: gunicorn BDMVS_PROJECT.wsgi
+web: gunicorn Myproject.wsgi
