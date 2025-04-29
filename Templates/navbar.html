@@ -52,6 +52,15 @@
             margin-top: 10px;
         }
 
+        .profile-pic {
+            width: 100px;          /* Adjust as needed */
+            height: 100px;         /* Adjust as needed */
+            object-fit: cover;     /* Ensures the image fills the circle */
+            border-radius: 50%;    /* Makes it round */
+            border: 2px solid #ccc; /* Optional: adds a border */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Optional: adds a soft shadow */
+        }
+
         .profile-placeholder {
             width: 40px;
             height: 40px;
@@ -96,8 +105,8 @@
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" 
                             data-bs-toggle="dropdown" aria-expanded="false">
                             {% if user.profile.profile_picture %}
-                            <img id="profileImage" src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-pic">
-                            {% else %}
+                            <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" 
+                                    class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; cursor: pointer;">{% else %}
                                 <div id="profileImagePlaceholder" class="profile-placeholder">
                                     {{ user.username|first|upper }}
                                 </div>
