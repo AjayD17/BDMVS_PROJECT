@@ -21,12 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+import os
+
+SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-secret-key')
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
 SECRET_KEY = 'django-insecure-p3r^mt6$kku3(=cot$mqvjt8srh%-4xp6ws6fyxoh+&gnf+v#9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['django-app.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -78,6 +84,17 @@ WSGI_APPLICATION = 'Myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+import os
+import dj_database_url  # Import dj-database-url
+
+# ... (other settings above remain the same)
+
+# Database configuration
+DATABASES = {
+    'default': dj_database_url.config(conn_max_age=600)
+}
+
+# ... (other settings below remain the same)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
