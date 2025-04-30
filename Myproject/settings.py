@@ -29,11 +29,9 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 SECRET_KEY = 'django-insecure-p3r^mt6$kku3(=cot$mqvjt8srh%-4xp6ws6fyxoh+&gnf+v#9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['django-app.onrender.com', 'localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = ['.railway.app']
 
 # Application definition
 
@@ -174,7 +172,6 @@ ALLOWED_HOSTS = ['*']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DEBUG = True
 
 
 
