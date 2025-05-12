@@ -151,18 +151,19 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Optional but recommended for caching
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # at the top of file
 
 import os 
-
-# At the end of file. add these lines
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
-MEDIA_URLS ='/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Also Make aure To set allowed_hosts to '*'
 
