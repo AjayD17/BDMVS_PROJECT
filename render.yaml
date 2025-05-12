@@ -2,10 +2,13 @@ services:
   - type: web
     name: Myproject
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn Myproject.wsgi"
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn Myproject.wsgi
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: Myproject.settings
       - key: PYTHON_VERSION
         value: 3.12.6
+
