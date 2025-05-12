@@ -22,16 +22,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 import os
+
 SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-secret-key')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
-
 
 SECRET_KEY = 'django-insecure-p3r^mt6$kku3(=cot$mqvjt8srh%-4xp6ws6fyxoh+&gnf+v#9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['.railway.app']
+ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['django-app.onrender.com', 'localhost', '127.0.0.1']
+
 
 # Application definition
 
@@ -172,6 +174,7 @@ ALLOWED_HOSTS = ['*']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+DEBUG = True
 
 
 
