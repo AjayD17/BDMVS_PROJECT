@@ -1,11 +1,11 @@
 services:
   - type: web
-    name: search_project
+    name: Myproject
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn search_project.wsgi"
+    startCommand: "gunicorn Myproject.wsgi"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
-        value: search_project.settings
+        value: Myproject.settings
       - key: PYTHON_VERSION
         value: 3.12.6
