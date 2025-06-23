@@ -230,144 +230,144 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark" style="margin-bottom: 4vh;">
-        <div class="container-fluid">
-            <a class="navbar-brand" style="color:black; font-size:3vh;" href="{% url 'home' %}"><img src="{% static 'Images/Logo.png' %}" style="height:10vh;">BDMVS</a>
-            <button class="navbar-toggler bg-dark" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <!-- Home Link -->
-                    <li class="nav-item {% if request.path == '/' %}active{% endif %}">
-                        <a class="nav-link" href="/" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">Home</a>
-                    </li>
-                    <!-- About Link -->
-                    <li class="nav-item {% if request.path == '/about/' %}active{% endif %}">
-                        <a class="nav-link" href="{% url 'home' %}" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">Back</a>
-                    </li>
-
-                    {% if user.is_authenticated %}
-                    <!-- Profile Dropdown (Settings and Logout) -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" 
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            {% if user.profile.profile_picture %}
-                                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" 
-                                    class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; cursor: pointer;">
-                            {% else %}
-                                <div id="profileImagePlaceholder" class="profile-placeholder">
-                                    {{ user.username|first|upper }} <!-- Display First Letter of Username -->
-                                </div>
-                            {% endif %}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="navbarDropdown">
-                            <li><a class="pl-2" href="{% url 'profile' %}">Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="pl-1" href="{% url 'settings' %}">Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="pl-2" href="{% url 'logout' %}">Logout</a></li>
-                        </ul>
-                    </li>
-                    
-                    {% else %}
-                    <!-- Login Link -->
-                    <li class="nav-item {% if request.path == '/login/' %}active{% endif %}">
-                        <a class="nav-link" href="{% url 'signin' %}" style="font-size:2.8vh; margin-top: 1vh; color:white; font-weight: bold; background-color: #3A59D1; padding-left:2vh; padding-right:2vh; border-radius:1vh;">Login</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
-    
-    <div class="container w-100">
-        <div class="row">
-            <div class="col-12">
-                {% if user.is_authenticated %}
-                <div class="search-container">
-                    <form id="categoryForm" method="get">
-                        <select name="category" id="categorySelect">
-                            <option value="protein" {% if category == 'protein' %}selected{% endif %}>Protein</option>
-                            <option value="genome" {% if category == 'genome' %}selected{% endif %}>Genome</option>
-                            <option value="nucleotide" {% if category == 'nucleotide' %}selected{% endif %}>Nucleotide</option>
-                            <option value="taxonomy" {% if category == 'taxonomy' %}selected{% endif %}>Taxonomy</option>
-                            <option value="pubchem" {% if category == 'pubchem' %}selected{% endif %}>Pubchem</option>
-                            <option value="blast" {% if category == 'blast' %}selected{% endif %}>Blast</option>
-                            <option value="general" {% if category == 'general' %}selected{% endif %}>Category</option>
-                        </select>
-                    </form>                    
-                    <input type="text" class="search-box" placeholder="Enter your search..." id="search-input">
-                    <button class="search-button bg-success">Search</button>
-                </div>
-                    <div class="d-flex flex-row justify-content-end mr-5">
-                        {% if user.username == "admin" %}
-                            <a href="{% url 'new_file' %}"><button class="add-button"> Add </button></a>
-                        {% endif %}
-                    </div>
-                    <div class="col-12">
-                        {% if data %}
-                        <div class="content-box">
-                            <table class="table table-bordered table-dark" id="search-results">
-                                <thead class="text-center">
-                                    <tr style="font-size:19px;">
-                                        <th>S.No</th>
-                                        {% if category == 'general' %}<th>All Databases</th>
-                                        {% elif category == 'protein' %}<th>Protein Name</th>
-                                        {% elif category == 'genome' %}<th>Genome Name</th>
-                                        {% elif category == 'nucleotide' %}<th>Nucleotide Name</th>
-                                        {% elif category == 'taxonomy' %}<th>Taxonomy Name</th>
-                                        {% elif category == 'pubchem' %}<th>Pubchem Compound Name</th>
-                                        {% elif category == 'blast' %}<th>Blast Name</th>
-                                        {% endif %}
-                                        <th>Description</th>
-                                        {% if user.username == "admin" %}
-                                            <th>Edit</th>
-                                            <th>Delete</th>
-                                        {% endif %}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for item in data %}
-                                    <tr class="table-row">
-                                        <td style="color:black; text-decoration: none;" class="pt-4">{{ forloop.counter }}</td>
-                                        <td class="pt-4"><a href="{% url 'Databases_detail' item.id %}" style="text-decoration: none; color: black;">{{ item.title }}</a></td>
-                                        <td class="text-center">
-                                            <a href="{% url 'Databases_detail' item.id %}" class="truncate-text" style="text-decoration: none; color: black;">
-                                                {{ item.description }}
-                                            </a>
-                                        </td>
-                                        {% if user.username == "admin" %}
-                                            <td><button class="btn mt-1" style="background-color: darkmagenta;"><a href="{% url 'update_protein' item.id %}" class="text-white">Edit</a></button></td>
-                                            <td><button class="btn btn-danger mt-1"><a href="{% url 'delete_protein' item.id %}" class="text-white">Delete</a></button></td>
-                                        {% endif %}
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        {% else %}
-                            <p class="text-center text-danger">
-                                {% if category == 'protein' %}
-                                    No protein data available.
-                                {% elif category == 'taxonomy' %}
-                                    No taxonomy data available.
-                                {% elif category == 'genome' %}
-                                    No genome data available.
-                                {% elif category == 'nucleotide' %}
-                                    No nucleotide data available.
-                                {% elif category == 'pubchem' %}
-                                    No pubchem data available.
-                                {% elif category == 'blast' %}
-                                    No blast data available.
-                                {% elif category == 'general' %}
-                                    No data available for the selected category.
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark" style="margin-bottom: 4vh;">
+            <div class="container-fluid">
+                <a class="navbar-brand" style="color:black; font-size:3vh;" href="{% url 'home' %}">
+                    <img src="{% static 'Images/Logo.png' %}" style="height:10vh;">BDMVS
+                </a>
+                <button class="navbar-toggler bg-dark" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+                            <a class="nav-link" href="/" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">Home</a>
+                        </li>
+                        <li class="nav-item {% if request.path == '/about/' %}active{% endif %}">
+                            <a class="nav-link" href="{% url 'home' %}" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">Back</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                {% if user.profile.profile_picture %}
+                                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture"
+                                        class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; cursor: pointer;">
+                                {% else %}
+                                    <div id="profileImagePlaceholder" class="profile-placeholder">
+                                        {{ user.username|first|upper }}
+                                    </div>
                                 {% endif %}
-                            </p>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="navbarDropdown">
+                                <li><a class="pl-2" href="{% url 'profile' %}">Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="pl-1" href="{% url 'settings' %}">Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="pl-2" href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <li class="nav-item {% if request.path == '/login/' %}active{% endif %}">
+                            <a class="nav-link" href="{% url 'signin' %}" style="font-size:2.8vh; margin-top: 1vh; color:white; font-weight: bold; background-color: #3A59D1; padding-left:2vh; padding-right:2vh; border-radius:1vh;">Login</a>
+                        </li>
                         {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    
+        <!-- Main Content -->
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-11 col-lg-10 pt-4">
+    
+                    {% if user.is_authenticated %}
+                    <div class="row search-container text-center">
+                        <div class="col-12 col-md-8 d-flex flex-column flex-sm-row align-items-center justify-content-center">
+                            <form id="categoryForm" method="get" class="d-flex flex-row flex-wrap justify-content-center">
+                                <select name="category" id="categorySelect" class="mb-2 mb-sm-0 me-sm-2">
+                                    <option value="protein" {% if category == 'protein' %}selected{% endif %}>Protein</option>
+                                    <option value="genome" {% if category == 'genome' %}selected{% endif %}>Genome</option>
+                                    <option value="nucleotide" {% if category == 'nucleotide' %}selected{% endif %}>Nucleotide</option>
+                                    <option value="taxonomy" {% if category == 'taxonomy' %}selected{% endif %}>Taxonomy</option>
+                                    <option value="pubchem" {% if category == 'pubchem' %}selected{% endif %}>Pubchem</option>
+                                    <option value="blast" {% if category == 'blast' %}selected{% endif %}>Blast</option>
+                                    <option value="general" {% if category == 'general' %}selected{% endif %}>Category</option>
+                                </select>
+                            </form>
+                            <input type="text" class="search-box me-sm-2" placeholder="Enter your search..." id="search-input">
+                            <button class="search-button bg-success mt-2 mt-sm-0">Search</button>
+                        </div>
                     </div>
-                    
+    
+                    <div class="row">
+                        <div class="col-12 col-md-start text-end mb-3">
+                            {% if user.username == "admin" %}
+                                <a href="{% url 'new_file' %}"><button class="add-button"> Add </button></a>
+                            {% endif %}
+                        </div>
+                    </div>
+    
+                    <div class="row">
+                        <div class="col-12">
+                            {% if data %}
+                            <div class="content-box table-responsive">
+                                <table class="table table-bordered table-dark" id="search-results">
+                                    <thead class="text-center">
+                                        <tr style="font-size:19px;">
+                                            <th>S.No</th>
+                                            {% if category == 'general' %}<th>All Databases</th>
+                                            {% elif category == 'protein' %}<th>Protein Name</th>
+                                            {% elif category == 'genome' %}<th>Genome Name</th>
+                                            {% elif category == 'nucleotide' %}<th>Nucleotide Name</th>
+                                            {% elif category == 'taxonomy' %}<th>Taxonomy Name</th>
+                                            {% elif category == 'pubchem' %}<th>Pubchem Compound Name</th>
+                                            {% elif category == 'blast' %}<th>Blast Name</th>
+                                            {% endif %}
+                                            <th>Description</th>
+                                            {% if user.username == "admin" %}
+                                                <th>Edit</th>
+                                                <th>Delete</th>
+                                            {% endif %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in data %}
+                                        <tr class="table-row">
+                                            <td class="pt-4 text-dark">{{ forloop.counter }}</td>
+                                            <td class="pt-4"><a href="{% url 'Databases_detail' item.id %}" class="text-dark text-decoration-none">{{ item.title }}</a></td>
+                                            <td class="text-center">
+                                                <a href="{% url 'Databases_detail' item.id %}" class="truncate-text text-dark text-decoration-none">
+                                                    {{ item.description }}
+                                                </a>
+                                            </td>
+                                            {% if user.username == "admin" %}
+                                                <td><button class="btn mt-1" style="background-color: darkmagenta;"><a href="{% url 'update_protein' item.id %}" class="text-white">Edit</a></button></td>
+                                                <td><button class="btn btn-danger mt-1"><a href="{% url 'delete_protein' item.id %}" class="text-white">Delete</a></button></td>
+                                            {% endif %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                                <p class="text-center text-danger">
+                                    {% if category == 'protein' %}No protein data available.
+                                    {% elif category == 'taxonomy' %}No taxonomy data available.
+                                    {% elif category == 'genome' %}No genome data available.
+                                    {% elif category == 'nucleotide' %}No nucleotide data available.
+                                    {% elif category == 'pubchem' %}No pubchem data available.
+                                    {% elif category == 'blast' %}No blast data available.
+                                    {% elif category == 'general' %}No data available for the selected category.
+                                    {% endif %}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% else %}
                         <p class="text-center text-danger">Please log in to see the search results.</p>
                         <div class="d-flex justify-content-center">
@@ -375,10 +375,10 @@
                                 <button class="btn btn-primary">Login</button>
                             </a>
                         </div>
-                {% endif %}
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
 
     <script>
         $(document).ready(function () {

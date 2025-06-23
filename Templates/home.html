@@ -524,11 +524,9 @@ footer p {
 }
 
 .card-container {
-    width: 280px;
+    width: 250px;
     background: #f8f9fa;
     padding: 40px;
-    padding-left:5vh;
-    padding-right:5vh;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
@@ -740,30 +738,27 @@ button:hover {
             box-shadow: 0 0 30px rgba(255, 255, 255, 1);
             transform: scale(1.1);
         }
+
         #about-us {
             background: #ffffff;
-            padding: 30px;
             text-align: center;
             border-radius: 10px;
-            padding-left:5vh;
-            padding-top:6vh;
-        }
+            padding-top: 6vh;
+          }
 
-        #about-us h3 {
+          #about-us h3 {
             font-weight: bold;
             margin-bottom: 10px;
             padding-bottom: 5px;
             border-bottom: 2px solid #007bff;
             display: inline-block;
-        }
+          }
 
-        #about-us p {
+          #about-us p {
             text-align: justify;
             font-size: 2.5vh;
             line-height: 1.6;
-            padding-left:10vh;
-            padding-right:10vh;
-        }
+          }
 
         .form-group {
             display: flex;
@@ -944,6 +939,18 @@ button:hover {
         border-radius: 5px;
     }
 
+    .navbar {
+      position: relative;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+      -ms-flex-align: center;
+      align-items: center;
+      -ms-flex-pack: justify;
+      justify-content: space-between;
+    }
+
     /* Logo Styling */
     .logo img {
         height: 8vh;
@@ -1040,9 +1047,6 @@ button:hover {
   max-width: 100%;
 }
 
-.container {
-    margin-top: 2vh;
-}
 
 /* Base dropdown styles */
 .custom-dropdown-list,
@@ -1108,13 +1112,24 @@ button:hover {
   margin: 4px 16px;
 }
 
+.container-fluid{
+    width: 80%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.accordion-item {
+   background-color: none;
+}
 
   </style>
   <body>
     <nav class="navbar navbar-expand-lg pt-4 pb-4">
-      <div class="container-fluid">
+      <div class="container-fluid w-100">
         <div class="logo d-flex align-items-center">
-          <img src="{% static 'Images/Logo.png' %}" style="height: 8vh; padding-left: 4vh;">
+          <img src="{% static 'Images/Logo.png' %}" style="height: 8vh; padding-left: 0vh;">
           <h4 style="padding-left: 1vh; padding-top: 2vh; font-weight: bold;">BDMVS</h4>
         </div>
     
@@ -1223,275 +1238,313 @@ button:hover {
         <div class="row align-items-center">
           <!-- Left Column: Text + Search -->
           <div class="col-12 col-md-7 mb-4">
-            <h5 class="section-title">BIOLOGICAL DEVELOPMENT MANAGEMENT & VISUALIZATION SYSTEM</h5>
-            <p class="section-description mt-4">
-              Empowering biological research through seamless data management and visualization.
-            </p>
-    
-            <form id="searchForm" method="GET" action="{% url 'search' %}" class="d-flex flex-column flex-sm-row align-items-start mt-4">
-              <input type="text" id="search_word" name="search_word"
-                     placeholder="Describe what you want to see"
-                     class="form-control search-input me-sm-2 mb-3 mb-sm-0 mt-2" style="padding-top: 4vh; padding-bottom: 4vh;"
-                     required>
-              <button type="submit" class="theme-btn btn-one search-btn text-white">
-                Search
-              </button>
+            <div class="text-center text-md-start">
+              <h5 class="section-title text-md-start">BIOLOGICAL DEVELOPMENT MANAGEMENT & VISUALIZATION SYSTEM</h5>
+              <p class="section-description text-md-start mt-4">
+                Empowering biological research through seamless data management and visualization.
+              </p>
+          
+              <form id="searchForm" method="GET" action="{% url 'search' %}"
+                  class="d-flex flex-column flex-sm-row align-items-center align-items-md-start justify-content-center justify-content-md-start">
+                <input type="text" id="search_word" name="search_word"
+                      placeholder="Describe what you want to see"
+                      class="form-control search-input me-sm-2 mb-3 mb-sm-0 mt-2"
+                      style="padding-top: 4vh; padding-bottom: 4vh;" required>
+                <button type="submit" class="theme-btn btn-one search-btn text-white">
+                  Search
+                </button>
             </form>
+
+            </div>
           </div>
     
           <!-- Right Column: Image -->
           <div class="col-12 col-md-5 text-center">
-            <img src="{% static 'Images/Logo.png' %}" alt="Logo" class="img-fluid logo-img pl-" style="height:65vh; width:100%;">
+            <img src="{% static 'Images/Logo.png' %}" alt="Logo"
+                 class="img-fluid logo-img" style="height: 65vh; width: 100%;">
           </div>
-    
         </div>
       </div>
-    </section>
-    
+    </section>    
 
     <section id="about-us">
-      <h3>About</h3>
-      <p style="padding-top:3vh"> The Biological Development Management & Visualization System (BDMVS) is an advanced platform designed to manage, analyze, and visualize biological data efficiently. It enables researchers to search, retrieve, and explore protein-related information from extensive biological databases, providing valuable insights into molecular structures and interactions. The system incorporates interactive visualization tools, allowing users to examine complex protein structures in detail. With a user-friendly interface, BDMVS simplifies data interpretation and enhances the research workflow for bioinformatics professionals and life science researchers. Its robust search functionality ensures quick access to essential biological metrics, supporting comparative analysis and hypothesis validation. BDMVS integrates with various biological databases, enabling seamless data retrieval and comprehensive analysis for structural and functional studies. By offering efficient data management and visualization, it empowers scientists to accelerate discoveries in genomics, proteomics, and molecular biology. Designed to streamline biological research, BDMVS serves as a crucial tool in modern computational biology and bioinformatics applications. </p>
-    </section>
+      <div class="container-fluid">
+        <div class="row justify-content-center">
+          <div class="col-12 col-md-12 col-lg-12 mb-4">
+            <h3>About</h3>
+            <p style="padding-top:3vh;">
+              The Biological Development Management & Visualization System (BDMVS) is an advanced platform designed to manage, analyze, and visualize biological data efficiently. It enables researchers to search, retrieve, and explore protein-related information from extensive biological databases, providing valuable insights into molecular structures and interactions. The system incorporates interactive visualization tools, allowing users to examine complex protein structures in detail. With a user-friendly interface, BDMVS simplifies data interpretation and enhances the research workflow for bioinformatics professionals and life science researchers. Its robust search functionality ensures quick access to essential biological metrics, supporting comparative analysis and hypothesis validation. BDMVS integrates with various biological databases, enabling seamless data retrieval and comprehensive analysis for structural and functional studies. By offering efficient data management and visualization, it empowers scientists to accelerate discoveries in genomics, proteomics, and molecular biology. Designed to streamline biological research, BDMVS serves as a crucial tool in modern computational biology and bioinformatics applications.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>           
 
     <section id="popular-resources" style="background-color: #e1f0da; padding-bottom:4vh;">
-      <h3 class="text-center" style="padding-top:5vh"><b>Popular Resources</b></h3>
-      <div class="about__page">
-        <div class="about__one" style="background-color: white">
-          <i class="fas fa-notes-medical"></i>
-          <h3><b>Protein</b></h3>
-          <p style="margin-right:2vh; font-size:2.5vh;">
+  <h3 class="text-center" style="padding-top:5vh; padding-bottom:4vh;"><b>Popular Resources</b></h3>
+  <div class="container-fluid text-center">
+    <div class="row">
+      <div class="col-12 col-md-6 col-lg-4 mb-3">
+        <div class="about__one p-3" style="background-color: white; border:2px solid; border-color:#02977d; border-radius:2vh;">
+          <i class="fas fa-notes-medical" style="color: #02977d; font-size:7vh;"></i>
+          <h3 class="mt-2"><b>Protein</b></h3>
+          <p style="margin-right:2vh; font-size:2.5vh; padding-left:2vh; padding-right:2vh;">
             Proteins are essential biomolecules made of amino acids, playing key roles in structure, function, and regulation in living organisms. They are vital for enzyme activity, immune response, and muscle growth.
           </p>
-          <a href="{% url 'search_category' %}?category=protein" style="color: white; text-decoration: none;"><button type="button" style="margin-top:6%;">
-            View All
-        </button></a>
+          <a href="{% url 'search_category' %}?category=protein" style="color: white; text-decoration: none;">
+            <button type="button" style="margin-top:4%; background-color:#02977d;">View All</button>
+          </a>
         </div>
-        <div class="about__two" style="background-color: white">
-          <i class="fas fa-ambulance"></i>
-          <h3><b>Genome</b></h3>
-          <p style="margin-right:2vh; font-size:2.5vh;">
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4 mb-3">
+        <div class="about__two p-3" style="background-color: white; border:2px solid; border-color:#02977d; border-radius:2vh;">
+          <i class="fas fa-ambulance" style="color: #02977d; font-size:7vh;"></i>
+          <h3 class="mt-2"><b>Genome</b></h3>
+          <p style="margin-right:2vh; font-size:2.5vh; padding-left:1.5vh; padding-right:1.5vh;">
             A genome is the complete set of genetic material in an organism, containing DNA sequences that encode genes and regulatory elements. It determines hereditary traits and guides cellular functions essential for life.
           </p>
-          <a href="{% url 'search_category' %}?category=genome" style="color: white; text-decoration: none;"><button type="button" style="margin-top:6%;">
-            View All
-        </button></a>
+          <a href="{% url 'search_category' %}?category=genome" style="color: white; text-decoration: none;">
+            <button type="button" style="margin-top:4%; background-color:#02977d;">View All</button>
+          </a>
         </div>
-        <div class="about__three" style="background-color: white">
-          <i class="fa-solid fa-dna"></i>
-          <h3><b>Nucleotide</b></h3>
-          <p style="margin-right:2vh; font-size:2.5vh;">
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4 mb-3">
+        <div class="about__three p-3" style="background-color: white; border:2px solid; border-color:#02977d; border-radius:2vh;">
+          <i class="fa-solid fa-dna" style="color: #02977d; font-size:7vh;"></i>
+          <h3 class="mt-2"><b>Nucleotide</b></h3>
+          <p style="margin-right:2vh; font-size:2.5vh; padding-left:2vh; padding-right:2vh;">
             Nucleotides are the building blocks of nucleic acids (DNA and RNA) and are composed of a pentose sugar (deoxyribose in DNA, ribose in RNA), a phosphate group, and a nitrogenous base (A, T/U, C, G). 
           </p>
-          <a href="{% url 'search_category' %}?category=nucleotide" style="color: white; text-decoration: none;"><button type="button" style="margin-top:13%;">
-            View All
-        </button></a>
+          <a href="{% url 'search_category' %}?category=nucleotide" style="color: white; text-decoration: none;">
+            <button type="button" style="margin-top:4%; background-color:#02977d;">View All</button>
+          </a>
         </div>
-        <div class="about__four" style="background-color: white">
-          <i class="fas fa-pills"></i>
-          <h3><b>Taxonomy</b></h3>
-          <p style="margin-right:2vh; font-size:2.5vh;">
-            A taxonomy is a hierarchical system used to classify and organize information, commonly in biology to categorize organisms based on shared characteristics. It helps in systematic identification, naming, and grouping of entities for better understanding and study.
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4 mb-3">
+        <div class="about__four p-3" style="background-color: white; border:2px solid; border-color:#02977d; border-radius:2vh;">
+          <i class="fas fa-pills" style="color: #02977d; font-size:7vh;"></i>
+          <h3 class="mt-2"><b>Taxonomy</b></h3>
+          <p style="margin-right:2vh; font-size:2.5vh; padding-left:1.5vh; padding-right:1.5vh;">
+            A taxonomy is a hierarchical system used to classify and organize information, commonly in biology to categorize organisms based on shared characteristics. It helps in systematic identification, naming, and grouping of entities for better understanding.
           </p>
-          <a href="{% url 'search_category' %}?category=taxonomy" style="color: white; text-decoration: none;"><button type="button" style="margin-top:8%;">
-            View All
-        </button></a>
+          <a href="{% url 'search_category' %}?category=taxonomy" style="color: white; text-decoration: none;">
+            <button type="button" style="margin-top:4%; background-color:#02977d;">View All</button>
+          </a>
         </div>
-        <div class="about__five" style="background-color: white">
-          <i class="fa-solid fa-flask"></i>
-          <h3><b>Pubchem</b></h3>
-          <p style="margin-right:2vh; font-size:2.5vh;">
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4 mb-3">
+        <div class="about__five p-3" style="background-color: white; border:2px solid; border-color:#02977d; border-radius:2vh;">
+          <i class="fa-solid fa-flask" style="color: #02977d; font-size:7vh;"></i>
+          <h3 class="mt-2"><b>Pubchem</b></h3>
+          <p style="margin-right:2vh; font-size:2.5vh; padding-left:2vh; padding-right:2vh;">
             PubChem is a free chemical database maintained by the NIH, providing detailed information on chemical compounds, structures, and bioactivities. It serves researchers by offering data on drug discovery, toxicology, and molecular interactions.
           </p>
-          <a href="{% url 'search_category' %}?category=pubchem" style="color: white; text-decoration: none;"><button type="button" style="margin-top:8%;">
-            View All
-        </button></a>
+          <a href="{% url 'search_category' %}?category=pubchem" style="color: white; text-decoration: none;">
+            <button type="button" style="margin-top:4%; background-color:#02977d;">View All</button>
+          </a>
         </div>
-        <div class="about__six" style="background-color: white">
-          <i class="fa-brands fa-searchengin" style="height:14vh; width:6vh;"></i>
-          <h3><b>Blast</b></h3>
-          <p style="margin-right:2vh; font-size:2.5vh;">
+      </div>
+
+      <div class="col-12 col-md-6 col-lg-4 mb-3">
+        <div class="about__six p-3" style="background-color: white; border:2px solid; border-color:#02977d; border-radius:2vh;">
+          <i class="fa-brands fa-searchengin" style="color: #02977d; font-size:7vh;""></i>
+          <h3 class="mt-2"><b>Blast</b></h3>
+          <p style="margin-right:2vh; font-size:2.5vh; padding-left:1.5vh; padding-right:1.5vh;">
             BLAST (Basic Local Alignment Search Tool) is a widely used bioinformatics algorithm for comparing nucleotide or protein sequences to databases. It identifies regions of local similarity, helping to infer functional, structural, and evolutionary relationships. 
           </p>
-          <a href="{% url 'search_category' %}?category=blast" style="color: white; text-decoration: none;"><button type="button" style="margin-top:16%;">
-            View All
-        </button></a>
+          <a href="{% url 'search_category' %}?category=blast" style="color: white; text-decoration: none;">
+            <button type="button" style="margin-top:4%; background-color:#02977d;">View All</button>
+          </a>
         </div>
       </div>
-    </section>
+
+    </div>
+  </div>
+</section>
+
 
     <section id="Book" style="background-color: white">
-      <h1 style="margin-top:3vh; text-align:center; padding-top:3vh; padding-bottom:2vh;"><b>Books on Bioinformatics</b></h1>
-      <div class="books-container">
-          <div class="book-list" style="display: flex; justify-content: center; gap: 4vh; flex-wrap: wrap;">
-              
-              <!-- First Row -->
-              <div class="card-container" style="background-color:#e1f0da">
-                <i class="fas fa-notes-medical"></i>
-                <h3><b>Protein</b></h3>
-                <p>
-                    Proteins are essential biomolecules made of amino acids, playing key roles in structure, function, and regulation in living organisms.
-                </p>
-                <a href="{% url 'books' %}?category=Protein" style="color: white; text-decoration: none;">
-                  <button type="button">Download</button>
-                </a>          
-              </div>
-            
-            <div class="card-container" style="background-color:#e1f0da">
-                <i class="fas fa-dna"></i>
-                <h3><b>Genome</b></h3>
-                <p>
-                    The genome contains all the genetic material of an organism. It holds instructions for building proteins and regulates biological functions.
-                </p>
-                <a href="{% url 'books' %}?category=Genome" style="color: white; text-decoration: none;">
-                  <button type="button">Download</button>
+      <h1 style="margin-top:3vh; text-align:center; padding-top:3vh; padding-bottom:4vh;"><b>Books on Bioinformatics</b></h1>
+      <div class="container-fluid">
+        <div class="row justify-content-center g-4">
+    
+          <!-- Protein -->
+          <div class="col-12 col-md-6 col-lg-4 d-flex">
+            <div class="card-container p-3 w-100 text-center" style="background-color:#e1f0da; border-radius: 12px; border:2px solid; border-color:#0d6efd; border-radius:2vh;">
+              <i class="fas fa-notes-medical fa-2x text-primary mb-3"></i>
+              <h3><b>Protein</b></h3>
+              <p>Proteins are essential biomolecules made of amino acids, playing key roles in structure, function, and regulation in living organisms.</p>
+              <a href="{% url 'books' %}?category=Protein" style="text-decoration: none;">
+                <button type="button" class="btn btn-primary mt-2">Download</button>
               </a>
             </div>
-            
-            <div class="card-container" style="background-color:#e1f0da">
-                <i class="fas fa-flask"></i>
-                <h3><b>Nucleotide</b></h3>
-                <p style="margin-bottom:5.3vh">
-                    Nucleotides are the building blocks of DNA and RNA, crucial for storing genetic information and cellular processes.
-                </p>
-                <a href="{% url 'books' %}?category=Nucleotide" style="color: white; text-decoration: none;">
-                  <button type="button" style="margin-top:2vh">Download</button>
-                </a>
-            </div>
-            
-            <div class="card-container" style="background-color:#e1f0da">
-                <i class="fas fa-leaf"></i>
-                <h3><b>Taxonomy</b></h3>
-                <p style="margin-bottom:5.3vh">
-                    Taxonomy classifies organisms into hierarchical categories based on genetic and evolutionary relationships.
-                </p>
-                <a href="{% url 'books' %}?category=Taxonomy" style="color: white; text-decoration: none;">
-                    <button type="button">Download</button>
-                </a>
-            </div>
-            
-            <div class="card-container" style="background-color:#e1f0da">
-                <i class="fas fa-prescription-bottle"></i>
-                <h3><b>PubChem</b></h3>
-                <p>
-                    PubChem is a chemical database with information on small molecules, including their properties and bioactivities.
-                </p>
-                <a href="{% url 'books' %}?category=Pubchem" style="color: white; text-decoration: none;">
-                  <button type="button">Download</button>
-              </a>
-            </div>
-            
-            <div class="card-container" style="background-color:#e1f0da">
-                <i class="fas fa-search"></i>
-                <h3><b>BLAST</b></h3>
-                <p>
-                    BLAST (Basic Local Alignment Search Tool) is used to compare biological sequences and find similarities in databases.
-                </p>
-                <a href="{% url 'books' %}?category=Blast" style="color: white; text-decoration: none;">
-                  <button type="button">Download</button>
-              </a>
-            </div>            
           </div>
+    
+          <!-- Genome -->
+          <div class="col-12 col-md-6 col-lg-4 d-flex">
+            <div class="card-container p-3 w-100 text-center" style="background-color:#e1f0da; border-radius: 12px; border:2px solid; border-color:#0d6efd; border-radius:2vh;">
+              <i class="fas fa-dna fa-2x text-primary mb-3"></i>
+              <h3><b>Genome</b></h3>
+              <p>The genome contains all the genetic material of an organism. It holds instructions for building proteins and regulates biological functions.</p>
+              <a href="{% url 'books' %}?category=Genome" style="text-decoration: none;">
+                <button type="button" class="btn btn-primary mt-2">Download</button>
+              </a>
+            </div>
+          </div>
+    
+          <!-- Nucleotide -->
+          <div class="col-12 col-md-6 col-lg-4 d-flex">
+            <div class="card-container p-3 w-100 text-center" style="background-color:#e1f0da; border-radius: 12px; border:2px solid; border-color:#0d6efd; border-radius:2vh;">
+              <i class="fas fa-flask fa-2x text-primary mb-3"></i>
+              <h3><b>Nucleotide</b></h3>
+              <p>Nucleotides are the building blocks of DNA and RNA, crucial for storing genetic information and cellular processes.</p>
+              <a href="{% url 'books' %}?category=Nucleotide" style="text-decoration: none;">
+                <button type="button" class="btn btn-primary mt-2">Download</button>
+              </a>
+            </div>
+          </div>
+    
+          <!-- Taxonomy -->
+          <div class="col-12 col-md-6 col-lg-4 d-flex">
+            <div class="card-container p-3 w-100 text-center" style="background-color:#e1f0da; border-radius: 12px; border:2px solid; border-color:#0d6efd; border-radius:2vh;">
+              <i class="fas fa-leaf fa-2x text-primary mb-3"></i>
+              <h3><b>Taxonomy</b></h3>
+              <p>Taxonomy classifies organisms into hierarchical categories based on genetic and evolutionary relationships.</p>
+              <a href="{% url 'books' %}?category=Taxonomy" style="text-decoration: none;">
+                <button type="button" class="btn btn-primary mt-2">Download</button>
+              </a>
+            </div>
+          </div>
+    
+          <!-- PubChem -->
+          <div class="col-12 col-md-6 col-lg-4 d-flex">
+            <div class="card-container p-3 w-100 text-center" style="background-color:#e1f0da; border-radius: 12px; border:2px solid; border-color:#0d6efd; border-radius:2vh;">
+              <i class="fas fa-prescription-bottle fa-2x text-primary mb-3"></i>
+              <h3><b>PubChem</b></h3>
+              <p>PubChem is a chemical database with information on small molecules, including their properties and bioactivities.</p>
+              <a href="{% url 'books' %}?category=Pubchem" style="text-decoration: none;">
+                <button type="button" class="btn btn-primary mt-2">Download</button>
+              </a>
+            </div>
+          </div>
+    
+          <!-- BLAST -->
+          <div class="col-12 col-md-6 col-lg-4 d-flex">
+            <div class="card-container p-3 w-100 text-center" style="background-color:#e1f0da; border-radius: 12px; border:2px solid; border-color:#0d6efd; border-radius:2vh;">
+              <i class="fas fa-search fa-2x text-primary mb-3"></i>
+              <h3><b>BLAST</b></h3>
+              <p>BLAST (Basic Local Alignment Search Tool) is used to compare biological sequences and find similarities in databases.</p>
+              <a href="{% url 'books' %}?category=Blast" style="text-decoration: none;">
+                <button type="button" class="btn btn-primary mt-2">Download</button>
+              </a>
+            </div>
+          </div>
+    
+        </div>
       </div>
-    </section>
+    </section>    
 
-    <section id="questions" style="background-color: #e1f0da; padding-bottom:5vh; padding-left:3vh; padding-right: 3vh;">
-      <div class="container">
-          <div class="sec-title mb-5" style="padding-top:6vh">
-              <span class="sub-title">General FAQ’s</span>
-              <h2>Frequently Asked Questions</h2>
-          </div>
-  
-          <div class="row align-items-center">
-              <!-- FAQ Section -->
-              <div class="col-lg-6">
-                  <div class="accordion" id="faqAccordion">
-                      <div class="accordion-items">
-                          <h2 class="accordion-header" id="headingOne">
-                              <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                  data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                  What is BDMVS?
-                              </button>
-                          </h2>
-                          <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-                              data-bs-parent="#faqAccordion">
-                              <div class="accordion-body">
-                                BDMVS (Biological Development Management & Visualization System) is a bioinformatics tool designed to manage, retrieve, and visualize biological data, particularly protein-related information.
-                              </div>
-                          </div>
-                      </div>
-  
-                      <div class="accordion-item">
-                          <h2 class="accordion-header" id="headingTwo">
-                              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                  data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                  What types of data can I search for in BDMVS?
-                              </button>
-                          </h2>
-                          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-                              data-bs-parent="#faqAccordion">
-                              <div class="accordion-body">
-                                BDMVS allows users to search for biological metrics, protein sequences, molecular structures, and functional annotations from integrated databases.
-                              </div>
-                          </div>
-                      </div>
-  
-                      <div class="accordion-item">
-                          <h2 class="accordion-header" id="headingThree">
-                              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                  data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                  How does BDMVS help in biological research?
-                              </button>
-                          </h2>
-                          <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
-                              data-bs-parent="#faqAccordion">
-                              <div class="accordion-body">
-                                BDMVS provides an intuitive platform for searching, analyzing, and visualizing biological data, aiding researchers in structural biology, genomics, and proteomics studies.
-                              </div>
-                          </div>
-                      </div>
-  
-                      <div class="accordion-item">
-                          <h2 class="accordion-header" id="headingFour">
-                              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                  data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                                  How can I access BDMVS?
-                              </button>
-                          </h2>
-                          <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
-                              data-bs-parent="#faqAccordion">
-                              <div class="accordion-body">
-                                BDMVS can be accessed through its web interface. Depending on the system, users may need to create an account to access full features.
-                              </div>
-                          </div>
-                      </div>
-  
-                      <div class="accordion-item">
-                          <h2 class="accordion-header" id="headingFive">
-                              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                  data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                                  Does BDMVS support 3D visualization of proteins?
-                              </button>
-                          </h2>
-                          <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive"
-                              data-bs-parent="#faqAccordion">
-                              <div class="accordion-body">
-                                Yes, BDMVS includes interactive visualization tools that allow users to explore complex protein structures in 3D.
-                              </div>
-                          </div>
-                      </div>
+    <section id="questions" style="background-color: #e1f0da; margin-top:5vh;">
+      <div class="container-fluid">
+        <div class="mb-5" style="padding-top:6vh; text-align: center;">
+          <span class="sub-title">General FAQ’s</span>
+          <h2>Frequently Asked Questions</h2>
+        </div>
+    
+        <div class="row align-items-center">
+          <!-- FAQ Section -->
+          <div class="col-12 col-md-12 col-lg-6 mb-4 mb-lg-0">
+            <div class="accordion" id="faqAccordion">
+              <div>
+                <h2 class="accordion-header" id="headingOne">
+                  <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    What is BDMVS?
+                  </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                  data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    BDMVS (Biological Development Management & Visualization System) is a bioinformatics tool designed to manage, retrieve, and visualize biological data, particularly protein-related information.
                   </div>
+                </div>
               </div>
-  
-              <!-- Image Section -->
-              <div class="col-lg-6">
-                  <div class="image-box" style="margin-left:7vh">
-                      <img src="{% static 'Images/Questions.jpg' %}" alt="FAQ Image">
+    
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    What types of data can I search for in BDMVS?
+                  </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                  data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    BDMVS allows users to search for biological metrics, protein sequences, molecular structures, and functional annotations from integrated databases.
                   </div>
+                </div>
               </div>
+    
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    How does BDMVS help in biological research?
+                  </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                  data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    BDMVS provides an intuitive platform for searching, analyzing, and visualizing biological data, aiding researchers in structural biology, genomics, and proteomics studies.
+                  </div>
+                </div>
+              </div>
+    
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFour">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                    How can I access BDMVS?
+                  </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+                  data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    BDMVS can be accessed through its web interface. Depending on the system, users may need to create an account to access full features.
+                  </div>
+                </div>
+              </div>
+    
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFive">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                    Does BDMVS support 3D visualization of proteins?
+                  </button>
+                </h2>
+                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive"
+                  data-bs-parent="#faqAccordion">
+                  <div class="accordion-body">
+                    Yes, BDMVS includes interactive visualization tools that allow users to explore complex protein structures in 3D.
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+    
+          <!-- Image Section -->
+          <div class="col-12 col-md-12 col-lg-6">
+            <div class="image-box text-center text-lg-start pb-5">
+              <img src="{% static 'Images/Questions.jpg' %}" alt="FAQ Image" class="img-fluid">
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
+    </section>    
 
     {% include "footer.html" %}
   </body>

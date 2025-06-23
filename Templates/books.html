@@ -8,170 +8,125 @@
     <link rel="stylesheet" href="{% static 'Bootstrap/css/bootstrap.min.css' %}">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px 0;
-            background: linear-gradient(to right, #6dd5ed, #2193b0);
-            margin-bottom:7vh;
-        }
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #6dd5ed, #2193b0);
+    margin: 0;
+    padding-bottom: 7vh;
+}
 
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-        /* Centering the search form */
-        #searchForm {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+/* Search form spacing handled by Bootstrap */
 
-        #search_word {
-            padding: 8px;
-            width: 250px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+#loading {
+    display: none;
+    margin-top: 20px;
+}
 
-        button {
-            padding: 8px 16px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        #loading {
-            display: none;
-            margin-top: 20px;
-        }
-
-        /* Box container for book results */
-        .box-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 5px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Styling each book result */
-        .book-result {
-    max-width: 1200px; /* Ensures it's not too wide */
-    width: 100%;
+/* Book result styling */
+.book-result {
     background-color: #e0e0e0;
-    margin-bottom: 2vh;
     border: 2px solid black;
     border-radius: 5px;
 }
 
-
 .book-cover {
-    width: 120px; /* Adjust width */
-    height: auto; /* Maintain aspect ratio */
+    width: 120px;
+    height: auto;
     object-fit: cover;
     border-radius: 5px;
 }
 
 .book-info {
     flex: 1;
-    padding-left: 15px;
 }
 
+/* Anchor tag general styles */
+a {
+    text-decoration: none;
+    color: #007BFF;
+}
 
-        .book-info strong {
-            text-align: left;
-            display: block;
-        }
+a:hover {
+    text-decoration: underline;
+}
 
-        a {
-            display: inline-block;
-            margin-top: 5px;
-            color: #007BFF;
-            text-decoration: none;
-        }
+/* Responsive is already handled via Bootstrap grid */
 
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .book-result {
-                flex-direction: column;
-                text-align: center;
-                align-items: center;
-            }
-
-            .book-cover {
-                margin-bottom: 10px;
-            }
-        }
     </style>
 </head>
 <body style="margin-bottom:5vh">
     {% include "navbar.html" %}
 
     {% if user.is_authenticated %}
-        <h2 style="margin-top: 4vh; color:white; text-shadow: 2px 2px 3px black;">
-            {% if request.GET.q %}
-                Search Results for "{{ request.GET.q }}"
-            {% else %}
-                Books on {{ category }}
-            {% endif %}
-        </h2>
+    <h2 style="margin-top: 15vh; color:white; text-shadow: 2px 2px 3px black;">
+        {% if request.GET.q %}
+            Search Results for "{{ request.GET.q }}"
+        {% else %}
+            Books on {{ category }}
+        {% endif %}
+    </h2>
 
-        <!-- Search Box -->
-        <form id="searchForm" method="GET" action="" style="margin-top:3vh">
-            <input type="text" id="search_word" name="q" placeholder="Search for books..." value="{{ request.GET.q }}" style="border:2px solid black;">
-            <button type="submit" style="border:1px solid white; color:white; border-radius:1vh;">Search</button>
-        </form>
+    <!-- Search Box -->
+<form id="searchForm" method="GET" action="" class="container mt-4">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-12 col-md-6 col-lg-5 mb-2 mb-md-0">
+            <input type="text" id="search_word" name="q" class="form-control" placeholder="Search for books..." value="{{ request.GET.q }}">
+        </div>
+        <div class="col-12 col-md-2 col-lg-2">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+    </div>
+</form>
 
-        <div id="loading">Loading...</div>
+<!-- Loading Text -->
+<div class="text-center mt-3" id="loading" style="display:none;">Loading...</div>
 
-        <div class="container d-flex flex-column align-items-center" id="book-list">
-            {% for book in books %}
-                <div class="book-result d-flex align-items-center p-3 justify-content-center">
+<!-- Book Results Section -->
+<div class="container mt-4" id="book-list">
+    <div class="row justify-content-center">
+        {% for book in books %}
+            <div class="col-12 col-md-10 mb-4">
+                <div class="book-result d-flex flex-column flex-md-row align-items-center p-3 border rounded shadow-sm" style="background-color: #b2b6ba;">
                     <!-- Book Cover Image -->
-                    <img src="{{ book.image.url }}" alt="{{ book.title }}" class="book-cover img-fluid">
+                    <div class="flex-shrink-0 text-center">
+                        <img src="{{ book.image.url }}" alt="{{ book.title }}" class="img-fluid" style="max-width: 150px; height: auto;">
+                    </div>
 
                     <!-- Book Info -->
-                    <div class="book-info d-flex flex-column justify-content-center px-4">
-                        <h5 class="mb-2 pb-1 pt-1">{{ book.title }}</h5>
-                        <p class="mb-2 pb-1">{{ book.description }}</p>
+                    <div class="flex-grow-1 px-md-4 mt-3 mt-md-0 text-center text-md-start">
+                        <h5 class="mb-2">{{ book.title }}</h5>
+                        <p class="mb-2">{{ book.description }}</p>
 
                         {% if book.files.all %}
                             {% for file in book.files.all %}
-                                <a href="{{ file.file.url }}" class="btn btn-primary btn-sm my-1" style="max-width:100px; padding:1.2vh; font-size:2.3vh;" download>Download</a>
+                                <a href="{{ file.file.url }}" class="btn btn-sm btn-primary my-1" download>Download</a>
                             {% endfor %}
                         {% else %}
                             <p class="text-muted">No files available for this book.</p>
                         {% endif %}
                     </div>
                 </div>
-            {% endfor %}
-        </div>
-
-    {% else %}
-        <!-- Show login prompt if not authenticated -->
-        <div style="margin-top: 10vh; text-align: center;">
-            <div style="background-color: #fff; padding: 30px; padding-left:40vh; padding-right:40vh; border-radius: 10px; display: inline-block; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                <h3 style="color: #dc3545;">Please Login to View Books</h3>
-                <p>You must be logged in to access the book search and download functionality.</p>
-                <a href="{% url 'signup' %}" class="btn btn-danger pl-4 pr-4">Login</a>
             </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- If not logged in -->
+{% else %}
+    <div class="container mt-5 text-center">
+        <div class="bg-white p-4 rounded shadow-lg" style="max-width: 600px; margin: auto;">
+            <h3 class="text-danger">Please Login to View Books</h3>
+            <p>You must be logged in to access the book search and download functionality.</p>
+            <a href="{% url 'signup' %}" class="btn btn-danger">Login</a>
         </div>
-    {% endif %}
+    </div>
+{% endif %}
+
+
 </body>
 
 </html>

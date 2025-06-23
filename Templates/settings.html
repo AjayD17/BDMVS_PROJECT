@@ -113,7 +113,7 @@
             <!-- Login & Security (Default Section) -->
             <section id="security" class="settings-content active">
                 <div class="container mt-4 d-flex justify-content-center">
-                    <div class="col-md-6 p-4 rounded shadow-lg bg-dark">
+                    <div class="col-md-6 p-4 rounded shadow-lg bg-dark" style="margin-top:10vh;">
                         <h2 class="text-center text-primary mb-4">
                             <i class="fas fa-lock"></i> <b>Login & Security</b>
                         </h2>
@@ -152,7 +152,7 @@
             </section>
 
             <!-- Terms & Conditions Section -->
-            <section id="terms" class="settings-content">
+            <section id="terms" class="settings-content" style="margin-top:10vh;">
                 <h2>📜 Terms & Conditions</h2>
 
                 <ol class="list-group">
@@ -216,7 +216,7 @@
                 <button class="btn btn-success w-100 mt-3 fw-bold" onclick="acceptTerms()">Accept Terms</button>
             </section>
 
-            <section id="datetime" class="settings-content"> 
+            <section id="datetime" class="settings-content" style="margin-top:10vh;"> 
                 <div class="container mt-5 d-flex justify-content-center">
                     <div class="col-md-8 p-4 rounded shadow bg-secondary">
                         <h2 class="text-center text-white mb-4">
@@ -252,14 +252,14 @@
             </section>   
 
             <!-- Theme -->
-            <section id="theme" class="settings-content">
+            <section id="theme" class="settings-content" style="margin-top:10vh;">
                 <h2>Theme</h2>
                 <p>Choose between Light and Dark mode.</p>
                 <button onclick="toggleTheme()">Switch Theme</button>
             </section>
 
             <!-- Feedback -->
-            <section id="feedback" class="settings-content">
+            <section id="feedback" class="settings-content" style="margin-top:10vh;">
                 <h2>Give Feedback</h2>
                 <textarea id="feedbackBox" placeholder="Write your feedback..." rows="6" class="form-control">{{ settings.feedback }}</textarea><br>
                 <button class="btn btn-primary" onclick="submitFeedback()">Submit</button>

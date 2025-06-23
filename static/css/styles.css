@@ -726,13 +726,7 @@ h1 {
     margin-bottom: 20px;
 }
 
-#searchForm {
-    margin-bottom: 20px;
-}
-
 #search_word {
-    padding: 10px;
-    width: 300px;
     margin-right: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;

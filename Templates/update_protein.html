@@ -20,6 +20,7 @@
             background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width:100%;
         }
 
         h1 {
@@ -121,71 +122,96 @@
         .center-link:hover {
             text-decoration: underline;
         }
+
+        .row {
+            --bs-gutter-x: 1.5rem;
+            --bs-gutter-y: 0;
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: calc(-1 * var(--bs-gutter-y));
+            margin-right: calc(-.5 * var(--bs-gutter-x));
+            margin-left: calc(-.5 * var(--bs-gutter-x));
+            margin-top:20vh;
+        }
     </style>
 </head>
 <body>
     {% include "navbar.html" %}
     <div class="container mt-4 mb-5">
-        <div class="row">
+        <div class="row" style="margin-top:15vh; width:100%;">
             <div class="col-12 text-center mt-5 mb-3">
-                <h1 class="page-header text-primary"><i class="fa-sharp fa-solid fa-pen-to-square"></i> Update Form</h1>
+                <h1 class="page-header text-primary">
+                    <i class="fa-sharp fa-solid fa-pen-to-square"></i> Update Form
+                </h1>
             </div>
-            <div class="offset-md-1 col-md-10">
+            <div class="col-12 col-sm-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
                 <!-- Form using POST method -->
                 <form method="POST" action="{% url 'update_protein' data.id %}" enctype="multipart/form-data" id="form">
                     {% csrf_token %}
+                    
                     <!-- Title Box -->
                     <div class="form-group">
                         <label for="title">Title</label>
                         <input type="text" class="form-control" name="title" placeholder="Enter Title" id="title-box" value="{{ data.title }}">
                     </div>
-
+    
                     <!-- Description Box -->
                     <div class="form-group">
                         <label for="description">Description</label>
                         <textarea class="form-control" name="description" placeholder="Enter Description" id="description-box" rows="6">{{ data.description }}</textarea>
                     </div>
-
+    
                     <!-- Subtitle Box -->
                     <div class="form-group">
                         <label for="subtitle">Sub Title</label>
                         <input type="text" class="form-control" name="subtitle" placeholder="Enter Subtitle" id="subtitle-box" value="{{ data.sub_title }}">
                     </div>
-
+    
                     <!-- Key-Value Pair Section -->
                     <div id="key-value-section">
                         {% for item in data.sub_content %}
-                            <div class="key-value">
-                                <input type="text" class="input-box mr-2" name="subcontent_key" placeholder="Enter Subcontent Key" value="{{ item.key }}">
-                                <input type="text" class="input-box" name="subcontent_value" placeholder="Enter Subcontent Value" value="{{ item.value }}">
-                                <i class="fa fa-trash delete-icon mt-4"></i>
+                            <div class="form-row key-value mb-2">
+                                <div class="col-12 col-sm-5 mb-2 mb-sm-0">
+                                    <input type="text" class="form-control" name="subcontent_key" placeholder="Enter Subcontent Key" value="{{ item.key }}">
+                                </div>
+                                <div class="col-12 col-sm-5 mb-2 mb-sm-0">
+                                    <input type="text" class="form-control" name="subcontent_value" placeholder="Enter Subcontent Value" value="{{ item.value }}">
+                                </div>
+                                <div class="col-12 col-sm-2 text-sm-center">
+                                    <i class="fa fa-trash delete-icon mt-2 d-block text-danger" style="cursor:pointer; margin-right:10vh;"></i>
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
-
-                    <!-- Button to Add More Key-Value Pairs -->
+    
+                    <!-- Add More Key-Value Pairs -->
                     <div class="mb-3">
                         <input type="button" value="Add" class="form-control" id="addrow" style="background-color: red; color:white;">
                     </div>
-
+    
                     <!-- Image File Input -->
                     <div class="form-group">
                         <label for="image">Image</label>
                         <input type="file" class="form-control" name="image" id="image-input">
                         {% if data.image %}
-                            <img src="{{ data.image.url }}" alt="Current image" width="100">
+                            <img src="{{ data.image.url }}" alt="Current image" width="100" class="mt-2">
                         {% else %}
-                            <p>No image uploaded</p>
+                            <p class="mt-2">No image uploaded</p>
                         {% endif %}
                     </div>
-
+    
                     <!-- Submit Button -->
-                    <button class="btn btn-primary btn-block" type="submit">Save Changes</button>
+                    <button class="btn btn-primary btn-block mt-4" type="submit">Save Changes</button>
                 </form>
-                <a href="{% url 'search_category' %}" class="center-link mb-5"><b>Back to Home Page</b></a>
+    
+                <!-- Back Link -->
+                <div class="text-center mt-4 mb-5">
+                    <a href="{% url 'search_category' %}" class="center-link"><b>Back to Home Page</b></a>
+                </div>
             </div>
         </div>
     </div>
+    
 
     <script>
         $(document).ready(function () {

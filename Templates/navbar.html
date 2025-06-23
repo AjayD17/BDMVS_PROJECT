@@ -8,129 +8,136 @@
     <title>Navbar</title>
 </head>
 <style>
-    .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(5px);
-            padding-top: 1vh;
-            padding-bottom: 1vh;
-        }
+.navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    transition: all 0.3s ease-in-out;
+}
 
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-        }
+.navbar a {
+    text-decoration: none;
+    margin: 0 15px;
+}
 
-        .navbar a:hover {
-            color: #ffc107;
-        }
+.navbar a:hover {
+    color: #ffc107;
+}
 
-        .navbar-brand {
-            color: white;
-            font-weight: bold;
-        }
+.navbar-brand {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
 
-        .navbar-nav {
-            margin-left: auto;
-        }
+.navbar-nav {
+    margin-left: auto;
+}
 
-        /* Style for Active Page */
-        .nav-item.active .nav-link {
-            color: #ffc107 !important;
-        }
+.nav-item.active .nav-link {
+    color: #ffc107 !important;
+}
 
-        .bio-images img {
-            width: 100%;
-            height: auto;
-            max-width: 300px;
-            margin: 10px;
-            border-radius: 10px;
-        }
+/* Profile Placeholder Styling */
+.profile-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    font-size: 2.5vh;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    border: 3px solid #007bff;
+    margin: auto;
+}
 
-        .custom-dropdown {
-            margin-right: 20px;
-            margin-top: 10px;
-        }
+/* Responsive Image Container (used elsewhere in your project) */
+.bio-images img {
+    width: 100%;
+    height: auto;
+    max-width: 300px;
+    margin: 10px;
+    border-radius: 10px;
+}
 
-        .profile-pic {
-            width: 100px;          /* Adjust as needed */
-            height: 100px;         /* Adjust as needed */
-            object-fit: cover;     /* Ensures the image fills the circle */
-            border-radius: 50%;    /* Makes it round */
-            border: 2px solid #ccc; /* Optional: adds a border */
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Optional: adds a soft shadow */
-        }
-
-        .profile-placeholder {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #007bff;
-            color: white;
-            font-size: 2.5vh;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-transform: uppercase;
-            border: 3px solid #007bff;
-            margin: auto;
-        }
+.custom-dropdown {
+    margin-right: 20px;
+    margin-top: 10px;
+}
 
 </style>
 <body>
     <!-- Separate Navbar for Category Page -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand" style="color:black; font-size:3vh;" href="{% url 'home' %}"><img src="{% static 'Images/Logo.png' %}" style="height:10vh;">BDMVS</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <!-- Logo and Brand -->
+            <div class="d-flex align-items-center col-6 col-md-4">
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}" style="font-size: 3vh; color: black;">
+                    <img src="{% static 'Images/Logo.png' %}" alt="Logo" style="height: 7vh;" class="me-2">
+                    <span class="fw-bold">BDMVS</span>
+                </a>
+            </div>
+    
+            <!-- Toggler for Mobile View -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+    
+            <!-- Collapsible Menu -->
+            <div class="collapse navbar-collapse col-12 col-md-8" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+    
                     <!-- Home Link -->
                     <li class="nav-item {% if request.path == '/' %}active{% endif %}">
-                        <a class="nav-link" href="/" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">Home</a>
+                        <a class="nav-link fw-bold text-dark" style="font-size: 2.5vh;" href="/">Home</a>
                     </li>
-                    <!-- About Link -->
+    
+                    <!-- Back Link -->
                     <li class="nav-item {% if request.path == '/about/' %}active{% endif %}">
-                        <a class="nav-link" href="{% url 'home' %}" style="font-size:2.8vh; margin-top: 1vh; color:black; font-weight: bold;">
-                            Back
-                        </a>
+                        <a class="nav-link fw-bold text-dark" style="font-size: 2.5vh;" href="{% url 'home' %}">Back</a>
                     </li>
-
+    
                     {% if user.is_authenticated %}
-                    <!-- Profile Dropdown (Settings and Logout) -->
+                    <!-- Profile with Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" 
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             {% if user.profile.profile_picture %}
-                            <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" 
-                                    class="rounded-circle" style="width: 45px; height: 45px; object-fit: cover; cursor: pointer;">{% else %}
-                                <div id="profileImagePlaceholder" class="profile-placeholder">
-                                    {{ user.username|first|upper }}
-                                </div>
+                                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture"
+                                    class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                            {% else %}
+                                <div class="profile-placeholder">{{ user.username|first|upper }}</div>
                             {% endif %}
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'settings' %}">Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end bg-dark">
+                            <li><a class="dropdown-item text-white" href="{% url 'profile' %}">Profile</a></li>
+                            <li><hr class="dropdown-divider bg-white"></li>
+                            <li><a class="dropdown-item text-white" href="{% url 'settings' %}">Settings</a></li>
+                            <li><hr class="dropdown-divider bg-white"></li>
+                            <li><a class="dropdown-item text-white" href="{% url 'logout' %}">Logout</a></li>
                         </ul>
                     </li>
-                    
+    
                     {% else %}
-                    <!-- Login Link -->
-                    <li class="nav-item {% if request.path == '/login/' %}active{% endif %}">
-                        <a class="nav-link" href="{% url 'signup' %}" style="font-size:2.8vh; margin-top: 1vh; color:white; font-weight: bold; background-color: #3A59D1; padding-left:2vh; padding-right:2vh; border-radius:1vh;">Login</a>
+                    <!-- Login Button -->
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold text-white" href="{% url 'signup' %}"
+                            style="background-color: #3A59D1; border-radius: 1vh; padding: 0.5vh 2vh; font-size: 2.5vh;">
+                            Login
+                        </a>
                     </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+    
 
     <!-- Include Bootstrap JS and Popper.js for dropdown functionality -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
